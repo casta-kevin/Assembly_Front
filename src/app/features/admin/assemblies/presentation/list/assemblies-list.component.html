@@ -1,0 +1,125 @@
+<section class="assemblies">
+  <header class="assemblies__header">
+    <div>
+      <p class="helper">Panel de administración</p>
+      <h1>Asambleas</h1>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="goToCreate()">
+      Crear asamblea
+    </button>
+  </header>
+
+  <section class="assemblies__stats">
+    <article class="stat-card">
+      <span>Total</span>
+      <strong>{{ stats().total }}</strong>
+    </article>
+    <article class="stat-card">
+      <span>Programadas</span>
+      <strong>{{ stats().upcoming }}</strong>
+    </article>
+    <article class="stat-card">
+      <span>En curso</span>
+      <strong>{{ stats().inProgress }}</strong>
+    </article>
+    <article class="stat-card">
+      <span>Finalizadas</span>
+      <strong>{{ stats().finished }}</strong>
+    </article>
+  </section>
+
+  <form class="assemblies__filters" [formGroup]="filterForm">
+    <div class="filter">
+      <label for="filter-search">Buscar</label>
+      <input
+        id="filter-search"
+        type="search"
+        formControlName="search"
+        class="form-control"
+        placeholder="Buscar por título o descripción"
+      />
+    </div>
+
+    <div class="filter">
+      <label for="filter-status">Estado</label>
+      <select id="filter-status" formControlName="status" class="form-control">
+        <option value="todas">Todas</option>
+        <option value="borrador">Borrador</option>
+        <option value="programada">Programada</option>
+        <option value="en-curso">En curso</option>
+        <option value="finalizada">Finalizada</option>
+        <option value="cerrada">Cerrada</option>
+      </select>
+    </div>
+
+    <div class="filter filter--dates" [formGroup]="filterForm.controls.range">
+      <label>Rango de fechas</label>
+      <div class="filter--dates__inputs">
+        <input type="date" formControlName="start" class="form-control" />
+        <input type="date" formControlName="end" class="form-control" />
+      </div>
+    </div>
+
+    <div class="filter filter--actions">
+      <button class="btn btn-ghost" type="button" (click)="resetFilters()">
+        Limpiar filtros
+      </button>
+    </div>
+  </form>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <section class="assemblies__table surface-card" role="region" aria-live="polite">
+    @if (isLoading()) {
+      <div class="assemblies__loading">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>Cargando asambleas…</p>
+      </div>
+    } @else if (!assemblies().length) {
+      <div class="assemblies__empty">
+        <h2>No hay asambleas registradas</h2>
+        <p class="helper">Crea tu primera asamblea para comenzar.</p>
+        <button class="btn btn-primary" type="button" (click)="goToCreate()">Crear asamblea</button>
+      </div>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Asamblea</th>
+            <th scope="col">Fechas</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Topics</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (assembly of assemblies(); track trackById($index, assembly)) {
+            <tr>
+              <td>
+                <p class="data-table__title">{{ assembly.title }}</p>
+                <p class="helper">{{ assembly.description }}</p>
+              </td>
+              <td>
+                <p>{{ assembly.startAt | date: 'medium' }}</p>
+                <p class="helper">Finaliza {{ assembly.endAt | date: 'medium' }}</p>
+              </td>
+              <td>
+                <span class="badge" [class]="statusBadgeClass(assembly.status)">
+                  {{ statusLabel(assembly.status) }}
+                </span>
+              </td>
+              <td>{{ assembly.topics }}</td>
+              <td>
+                <div class="actions">
+                  <button type="button" class="btn btn-ghost" (click)="goToAssembly(assembly.id)">Gestionar</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</section>

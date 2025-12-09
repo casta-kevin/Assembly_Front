@@ -1,0 +1,155 @@
+.participants {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.participants__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.participants__actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.participants__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  list-style: none;
+  color: var(--color-text-muted);
+}
+
+.participants__grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.participants__assigned,
+.participants__available {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.participants__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.participants__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.participant-list,
+.candidate-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.participant-item,
+.candidate-item {
+  display: grid;
+  gap: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background-color: rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-sm);
+}
+
+.participant-item {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  align-items: center;
+}
+
+.participant-item__info h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.participant-item__info p {
+  margin: 0.25rem 0 0;
+}
+
+.participant-item__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.participant-item__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.candidate-item {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.candidate-item__name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.participants__search {
+  display: flex;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1024px) {
+  .participants__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .participant-item {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+}

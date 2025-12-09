@@ -1,0 +1,123 @@
+<section class="topic-questions" *ngIf="!isLoading(); else loading">
+  <header class="topic-questions__header">
+    <div>
+      <a class="link" [routerLink]="['/admin', 'assemblies', assemblyId()]">&larr; Volver a la asamblea</a>
+      <h1>Preguntas del topic</h1>
+      <p class="helper">Configura preguntas de votación Sí/No, ventanas de votación y estado operativo.</p>
+      @if (topic()) {
+        <p class="topic-questions__topic">Topic seleccionado: <strong>{{ topic()?.title }}</strong></p>
+      }
+      @if (topicsList().length > 1) {
+        <div class="topic-questions__selector">
+          <label class="helper" for="topic-selector">Cambiar topic</label>
+          <select id="topic-selector" class="form-control" [value]="topicId()" (change)="navigateToTopic($any($event.target).value)">
+            @for (item of topicsList(); track item.id) {
+              <option [value]="item.id">{{ item.title }}</option>
+            }
+          </select>
+        </div>
+      }
+    </div>
+    <div class="topic-questions__actions">
+      <button class="btn btn-ghost" type="button" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-primary" type="button" [disabled]="isSaving()" (click)="saveQuestions()">
+        @if (isSaving()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Guardando…</span>
+        } @else {
+          <span>Guardar cambios</span>
+        }
+      </button>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="feedback feedback--success" role="status">{{ successMessage() }}</p>
+  }
+
+  @if (!topic()) {
+    <div class="surface-card topic-questions__empty">
+      <h2>No encontramos el topic solicitado</h2>
+      <p class="helper">Verifica la URL o regresa al detalle de la asamblea.</p>
+    </div>
+  } @else {
+    <form class="topic-questions__form" [formGroup]="form" novalidate>
+      @for (question of questions.controls; track question.get('id')?.value; let index = $index) {
+        <article class="surface-card question-card" [formGroup]="question">
+          <header class="question-card__header">
+            <div>
+              <span class="badge badge--ghost">Pregunta {{ index + 1 }}</span>
+              <h2>{{ question.get('text')?.value || 'Pregunta sin título' }}</h2>
+            </div>
+            <button
+              type="button"
+              class="btn btn-ghost"
+              [disabled]="questions.length <= 1"
+              (click)="removeQuestion(index)"
+            >
+              Eliminar
+            </button>
+          </header>
+
+          <div class="question-card__grid">
+            <div class="form-field">
+              <label>Título de la pregunta</label>
+              <input type="text" class="form-control" formControlName="text" placeholder="¿Aprueba la propuesta?" />
+            </div>
+
+            <div class="form-field">
+              <label>Descripción / contexto</label>
+              <textarea
+                rows="3"
+                class="form-control"
+                formControlName="description"
+                placeholder="Añade contexto que los votantes necesitan conocer."
+              ></textarea>
+            </div>
+
+            <div class="form-field">
+              <label>Estado</label>
+              <select class="form-control" formControlName="status">
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label>Inicio de votación</label>
+              <input type="datetime-local" class="form-control" formControlName="startAt" />
+            </div>
+
+            <div class="form-field">
+              <label>Cierre de votación</label>
+              <input type="datetime-local" class="form-control" formControlName="endAt" />
+            </div>
+
+            <div class="form-field form-field--switch">
+              <label class="switch">
+                <input type="checkbox" formControlName="allowsTieBreaker" />
+                <span>Permitir voto de desempate del administrador</span>
+              </label>
+            </div>
+          </div>
+        </article>
+      }
+    </form>
+
+    <div class="topic-questions__footer">
+      <button type="button" class="btn btn-ghost" (click)="addQuestion()">Agregar pregunta</button>
+    </div>
+  }
+</section>
+
+<ng-template #loading>
+  <div class="topic-questions__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando configuración de preguntas…</p>
+  </div>
+</ng-template>

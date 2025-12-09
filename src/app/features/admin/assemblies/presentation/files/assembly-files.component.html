@@ -1,0 +1,68 @@
+<section class="files" *ngIf="!isLoading(); else loading">
+  <header class="files__header">
+    <div>
+      <a class="link" [routerLink]="['/admin', 'assemblies', assemblyId()]">&larr; Volver a la asamblea</a>
+      <h1>Documentos de la asamblea</h1>
+      <p class="helper">Descarga actas, anexos y presentaciones. Cada descarga queda registrada en auditoría.</p>
+    </div>
+    <div class="files__actions">
+      <button class="btn btn-ghost" type="button" (click)="navigateBack()">Cerrar</button>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="feedback feedback--success" role="status">{{ successMessage() }}</p>
+  }
+
+  <section class="surface-card files__filters">
+    <label for="file-filter" class="form-field">
+      <span>Tipo de archivo</span>
+      <select id="file-filter" class="form-control" [formControl]="filterControl">
+        @for (option of fileTypeOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+  </section>
+
+  <section class="surface-card files__list">
+    @if (!filteredFiles().length) {
+      <div class="files__empty">
+        <h2>No hay archivos disponibles</h2>
+        <p class="helper">Todavía no se han cargado documentos para esta asamblea.</p>
+      </div>
+    } @else {
+      <ul class="file-grid">
+        @for (file of filteredFiles(); track file.id) {
+          <li class="file-card">
+            <div class="file-card__header">
+              <h3>{{ file.name }}</h3>
+              <span class="badge badge--ghost">{{ file.type | titlecase }}</span>
+            </div>
+            <p class="helper">Subido el {{ file.uploadedAt | date: 'mediumDate' }} por {{ file.uploadedBy }}</p>
+            <p class="file-card__meta">{{ (file.sizeKb / 1024) | number: '1.1-1' }} MB</p>
+            <button class="btn btn-primary" type="button" [disabled]="isRegistering()" (click)="download(file)">
+              @if (isRegistering()) {
+                <span class="spinner" aria-hidden="true"></span>
+                <span>Registrando…</span>
+              } @else {
+                <span>Descargar</span>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</section>
+
+<ng-template #loading>
+  <div class="files__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando archivos…</p>
+  </div>
+</ng-template>

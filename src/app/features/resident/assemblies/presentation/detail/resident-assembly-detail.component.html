@@ -1,0 +1,123 @@
+<section class="assembly-detail" *ngIf="!isLoading(); else loading">
+  <header class="assembly-detail__header">
+    <a class="link" [routerLink]="['/resident', 'assemblies']">&larr; Volver al listado</a>
+    @if (assembly(); as detail) {
+      <div class="assembly-detail__headline">
+        <h1>{{ detail.title }}</h1>
+        <span class="badge" [ngClass]="{
+          'badge--scheduled': detail.status === 'programada',
+          'badge--running': detail.status === 'en-curso',
+          'badge--finished': detail.status === 'finalizada',
+          'badge--closed': detail.status === 'cerrada'
+        }">{{ detail.status | titlecase }}</span>
+      </div>
+      <p class="helper">Consulta la información compartida por la administración para esta asamblea.</p>
+    }
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (assembly(); as detail) {
+    <section class="surface-card assembly-detail__summary">
+      <dl>
+        <div>
+          <dt>Fecha de inicio</dt>
+          <dd>{{ detail.startAt | date: 'fullDate' }} — {{ detail.startAt | date: 'shortTime' }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de cierre</dt>
+          <dd>{{ detail.endAt | date: 'fullDate' }} — {{ detail.endAt | date: 'shortTime' }}</dd>
+        </div>
+      </dl>
+      <article>
+        <h2>Descripción</h2>
+        <p>{{ detail.description }}</p>
+      </article>
+      @if (isHistoryView()) {
+        <p class="feedback feedback--info" role="status">Esta asamblea ha finalizado. La información es de solo lectura.</p>
+      } @else {
+        <p class="feedback feedback--info" role="status">La asamblea aún no ha finalizado. Puedes consultar los temas preparados.</p>
+      }
+    </section>
+
+    @if (isLiveAssembly() && detail.currentQuestion) {
+      <section class="surface-card assembly-detail__live" aria-label="Votación en curso">
+        <header>
+          <h2>Votación en curso</h2>
+          <span class="badge badge--running">En curso</span>
+        </header>
+        <p class="assembly-detail__live-topic">{{ detail.currentQuestion.topicTitle }}</p>
+        <h3>{{ detail.currentQuestion.questionText }}</h3>
+        @if (detail.currentQuestion.questionDescription) {
+          <p class="helper">{{ detail.currentQuestion.questionDescription }}</p>
+        }
+        <div class="assembly-detail__live-meta">
+          <span>Finaliza: {{ detail.currentQuestion.closesAt | date: 'medium' }}</span>
+          <span>Tu voto: {{ detail.currentQuestion.userVote ? (detail.currentQuestion.userVote | titlecase) : 'Pendiente' }}</span>
+        </div>
+        <button
+          class="btn btn-primary"
+          type="button"
+          [routerLink]="['/resident', 'assemblies', detail.id, 'live']"
+        >
+          Abrir votación en vivo
+        </button>
+      </section>
+    } @else if (isLiveAssembly()) {
+      <section class="surface-card assembly-detail__live" aria-label="Estado de votación">
+        <header>
+          <h2>Votación en curso</h2>
+          <span class="badge badge--ghost">Sin pregunta activa</span>
+        </header>
+        <p class="helper">Aún no hay una pregunta activa para votar. Vuelve a revisar más adelante.</p>
+      </section>
+    }
+
+    <section class="surface-card assembly-detail__topics" aria-label="Temas del orden del día">
+      @if (!detail.topics.length) {
+        <div class="assembly-detail__empty">
+          <h2>No hay temas registrados</h2>
+          <p class="helper">La administración aún no ha publicado el orden del día.</p>
+        </div>
+      } @else {
+        <ol>
+          @for (topic of detail.topics; track trackByTopic($index, topic)) {
+            <li>
+              <article>
+                <header>
+                  <h3>{{ topic.title }}</h3>
+                  @if (topic.description) {
+                    <p>{{ topic.description }}</p>
+                  }
+                </header>
+                @if (topic.questions.length) {
+                  <ul>
+                    @for (question of topic.questions; track trackByQuestion($index, question)) {
+                      <li>
+                        <span>{{ question.text }}</span>
+                        @if (question.description) {
+                          <small>{{ question.description }}</small>
+                        }
+                      </li>
+                    }
+                  </ul>
+                }
+              </article>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+  } @else if (!errorMessage()) {
+    <p class="helper">Selecciona una asamblea válida para consultar la información.</p>
+  }
+</section>
+
+<ng-template #loading>
+  <div class="assembly-detail__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando asamblea…</p>
+  </div>
+</ng-template>

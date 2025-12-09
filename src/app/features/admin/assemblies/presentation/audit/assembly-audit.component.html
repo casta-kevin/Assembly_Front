@@ -1,0 +1,83 @@
+<section class="audit" *ngIf="!isLoading(); else loading">
+  <header class="audit__header">
+    <div>
+      <a class="link" [routerLink]="['/admin', 'assemblies', assemblyId()]">&larr; Volver a la asamblea</a>
+      <h1>Auditoría de operaciones</h1>
+      <p class="helper">Revisa las acciones realizadas sobre la asamblea y filtra por usuario, acción o fecha.</p>
+    </div>
+    <button class="btn btn-ghost" type="button" (click)="goBack()">Cerrar</button>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <form class="audit__filters surface-card" [formGroup]="filterForm">
+    <div class="form-field">
+      <label for="audit-search">Buscar</label>
+      <input id="audit-search" class="form-control" type="search" formControlName="search" placeholder="Buscar por usuario, acción o detalle" />
+    </div>
+    <div class="form-field">
+      <label for="audit-user">Usuario</label>
+      <select id="audit-user" class="form-control" formControlName="user">
+        @for (option of userOptions(); track option) {
+          <option [value]="option">{{ option || 'Todos' }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="audit-action">Acción</label>
+      <select id="audit-action" class="form-control" formControlName="action">
+        @for (option of actionOptions(); track option) {
+          <option [value]="option">
+            {{ option === 'todas' ? 'Todas' : actionLabel(option) }}
+          </option>
+        }
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="audit-start">Desde</label>
+      <input id="audit-start" class="form-control" type="datetime-local" formControlName="start" />
+    </div>
+    <div class="form-field">
+      <label for="audit-end">Hasta</label>
+      <input id="audit-end" class="form-control" type="datetime-local" formControlName="end" />
+    </div>
+    <div class="audit__filters-actions">
+      <button class="btn btn-ghost" type="button" (click)="resetFilters()">Limpiar filtros</button>
+    </div>
+  </form>
+
+  <section class="audit__results surface-card">
+    @if (!filteredEvents().length) {
+      <div class="audit__empty">
+        <h2>Sin eventos registrados con este filtro</h2>
+        <p class="helper">Ajusta los filtros o revisa un rango de fechas diferente.</p>
+      </div>
+    } @else {
+      <ul class="audit__list">
+        @for (event of filteredEvents(); track event.id) {
+          <li class="audit__item">
+            <div class="audit__item-header">
+              <span class="badge badge--ghost">{{ actionLabel(event.action) }}</span>
+              <time [attr.datetime]="event.timestamp">{{ event.timestamp | date: 'medium' }}</time>
+            </div>
+            <p class="audit__item-meta">
+              <strong>{{ event.actorName }}</strong> · {{ event.entityType | titlecase }} · {{ event.entityId || '—' }}
+            </p>
+            @if (metadataSummary(event); as summary) {
+              <p class="helper">{{ summary }}</p>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</section>
+
+<ng-template #loading>
+  <div class="audit__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando auditoría…</p>
+  </div>
+</ng-template>

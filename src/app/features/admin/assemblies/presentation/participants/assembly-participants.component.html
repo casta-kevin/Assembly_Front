@@ -1,0 +1,160 @@
+<section class="participants" *ngIf="!isLoading(); else loading">
+  <header class="participants__header">
+    <div>
+      <a class="link" [routerLink]="['/admin', 'assemblies', assemblyId()]">&larr; Volver a la asamblea</a>
+      <h1>Participantes de la asamblea</h1>
+      <p class="helper">Asigna residentes, define permisos de votación y controla el acceso antes y durante la sesión.</p>
+      <ul class="participants__summary">
+        <li><strong>{{ summary().total }}</strong> participantes asignados</li>
+        <li><strong>{{ summary().startVoters }}</strong> autorizados para iniciar la asamblea</li>
+        <li><strong>{{ summary().blocked }}</strong> bloqueados</li>
+      </ul>
+    </div>
+    <div class="participants__actions">
+      <button class="btn btn-ghost" type="button" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-primary" type="button" [disabled]="isSaving()" (click)="saveChanges()">
+        @if (isSaving()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Guardando…</span>
+        } @else {
+          <span>Guardar cambios</span>
+        }
+      </button>
+    </div>
+  </header>
+
+  @if (isLocked()) {
+    <p class="feedback feedback--info" role="status">
+      La asamblea está en curso o finalizada. No es posible agregar o eliminar participantes, pero puedes actualizar su estado.
+    </p>
+  }
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="feedback feedback--success" role="status">{{ successMessage() }}</p>
+  }
+
+  <div class="participants__grid">
+    <section class="surface-card participants__assigned">
+      <header class="section-header">
+        <h2>Asignados</h2>
+        <p class="helper">Controla permisos de votación y estado de cada participante.</p>
+      </header>
+
+      @if (!participants().length) {
+        <div class="participants__empty">
+          <h3>No hay participantes asignados</h3>
+          <p class="helper">Selecciona residentes desde el catálogo para agregarlos.</p>
+        </div>
+      } @else {
+        <ul class="participant-list">
+          @for (participant of participants(); track participant.id) {
+            <li class="participant-item">
+              <div class="participant-item__info">
+                <h3>{{ participant.name }}</h3>
+                <p class="helper">{{ participant.unit }}</p>
+                <span class="badge" [class]="participant.status === 'confirmado' ? 'badge--success' : participant.status === 'pendiente' ? 'badge--ghost' : 'badge--warning'">
+                  {{ participant.status | titlecase }}
+                </span>
+                @if (participant.joinedAt) {
+                  <p class="helper">Registrado {{ participant.joinedAt | date: 'medium' }}</p>
+                }
+              </div>
+              <div class="participant-item__controls">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    [checked]="participant.canVoteStart"
+                    (change)="toggleCanVoteStart(participant.id)"
+                  />
+                  <span>Puede votar el inicio</span>
+                </label>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    [checked]="participant.canVoteQuestions"
+                    (change)="toggleCanVoteQuestions(participant.id)"
+                  />
+                  <span>Puede votar preguntas</span>
+                </label>
+                <div class="form-field">
+                  <label>Estado</label>
+                  <select class="form-control" [value]="participant.status" (change)="updateStatus(participant.id, $any($event.target).value)">
+                    <option value="pendiente">Pendiente</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="bloqueado">Bloqueado</option>
+                  </select>
+                </div>
+              </div>
+              <div class="participant-item__actions">
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  [disabled]="isLocked()"
+                  (click)="removeParticipant(participant.id)"
+                >
+                  Quitar
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="surface-card participants__available">
+      <header class="section-header">
+        <h2>Catálogo de residentes</h2>
+        <p class="helper">Busca y asigna participantes habilitados para esta asamblea.</p>
+      </header>
+
+      <form class="participants__search" novalidate>
+        <label for="search-resident" class="sr-only">Buscar residente</label>
+        <input
+          id="search-resident"
+          type="search"
+          class="form-control"
+          placeholder="Buscar por nombre o unidad"
+          [formControl]="filterControl"
+          [disabled]="isLocked() && !filteredCandidates().length"
+        />
+      </form>
+
+      @if (!filteredCandidates().length) {
+        <div class="participants__empty">
+          <h3>Sin resultados</h3>
+          <p class="helper">No hay residentes disponibles con el criterio actual.</p>
+        </div>
+      } @else {
+        <ul class="candidate-list">
+          @for (candidate of filteredCandidates(); track candidate.id) {
+            <li class="candidate-item">
+              <div>
+                <p class="candidate-item__name">{{ candidate.name }}</p>
+                <p class="helper">{{ candidate.unit }}</p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-ghost"
+                [disabled]="isLocked()"
+                (click)="addParticipant(candidate)"
+              >
+                Agregar
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</section>
+
+<ng-template #loading>
+  <div class="participants__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando participantes…</p>
+  </div>
+</ng-template>

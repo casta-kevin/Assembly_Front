@@ -1,0 +1,86 @@
+<div class="agenda">
+  <header class="agenda__header">
+    <h3>Topics planificados</h3>
+    <button type="button" class="btn btn-primary" (click)="addTopicRequested.emit()">
+      Añadir topic
+    </button>
+  </header>
+
+  @if (!agenda.length) {
+    <p class="helper">Agrega tu primer topic para definir el orden del día.</p>
+  }
+
+  <div cdkDropList class="agenda__list" [cdkDropListData]="agenda.controls" (cdkDropListDropped)="drop($event)">
+    @for (topic of agenda.controls; track trackByIndex($index); let index = $index) {
+      <article class="agenda__item" [formGroup]="topic" cdkDrag>
+        <header class="agenda__item-header">
+          <div class="agenda__item-title">
+            <span cdkDragHandle class="agenda__drag" aria-label="Reordenar topic">&#x2630;</span>
+            <h4>{{ topicLabel(index, topic) }}</h4>
+          </div>
+          <button type="button" class="btn btn-ghost" (click)="removeTopicRequested.emit(index)">
+            Eliminar
+          </button>
+        </header>
+
+        <div class="agenda__item-grid">
+          <div class="form-field">
+            <label>Título</label>
+            <input class="form-control" type="text" formControlName="title" placeholder="Presentación de resultados" />
+          </div>
+          <div class="form-field">
+            <label>Descripción</label>
+            <textarea class="form-control" rows="3" formControlName="description" placeholder="Detalle de los puntos a tratar."></textarea>
+          </div>
+          <div class="form-field">
+            <label>Inicio planificado</label>
+            <input class="form-control" type="datetime-local" formControlName="startAt" />
+          </div>
+          <div class="form-field">
+            <label>Cierre planificado</label>
+            <input class="form-control" type="datetime-local" formControlName="endAt" />
+          </div>
+        </div>
+
+        <section class="agenda__questions" formArrayName="questions">
+          <header class="agenda__questions-header">
+            <h5>Preguntas de votación</h5>
+            <button type="button" class="btn btn-ghost" (click)="addQuestion(topic)">Añadir pregunta</button>
+          </header>
+
+          @for (question of questions(topic).controls; track trackByIndex($index); let qIndex = $index) {
+            <div class="question" [formGroupName]="qIndex">
+              <div class="question__grid">
+                <div class="form-field">
+                  <label>Enunciado</label>
+                  <textarea class="form-control" rows="2" formControlName="text" placeholder="¿Aprueba la propuesta?"></textarea>
+                </div>
+                <div class="form-field">
+                  <label>Descripción</label>
+                  <textarea class="form-control" rows="2" formControlName="description" placeholder="Contexto adicional"></textarea>
+                </div>
+                <div class="form-field">
+                  <label>Inicio pregunta</label>
+                  <input class="form-control" type="datetime-local" formControlName="startAt" />
+                </div>
+                <div class="form-field">
+                  <label>Cierre pregunta</label>
+                  <input class="form-control" type="datetime-local" formControlName="endAt" />
+                </div>
+              </div>
+              <div class="question__footer">
+                <label class="switch">
+                  <input type="checkbox" formControlName="allowsTieBreaker" />
+                  <span>Permitir voto de desempate del administrador</span>
+                </label>
+                <button type="button" class="btn btn-ghost" (click)="removeQuestion(topic, qIndex)">
+                  Eliminar pregunta
+                </button>
+              </div>
+            </div>
+          }
+        </section>
+      </article>
+    }
+  </div>
+</div>

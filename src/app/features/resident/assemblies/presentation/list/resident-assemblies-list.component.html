@@ -1,0 +1,85 @@
+<section class="assignments" *ngIf="!isLoading(); else loading">
+  <header class="assignments__header">
+    <div>
+      <h1>Mis asambleas asignadas</h1>
+      <p class="helper">Consulta las asambleas próximas, en curso y finalizadas en las que participas.</p>
+    </div>
+    <dl class="assignments__stats">
+      <div>
+        <dt>Total</dt>
+        <dd>{{ stats().total }}</dd>
+      </div>
+      <div>
+        <dt>Próximas</dt>
+        <dd>{{ stats().upcoming }}</dd>
+      </div>
+      <div>
+        <dt>En curso</dt>
+        <dd>{{ stats().live }}</dd>
+      </div>
+      <div>
+        <dt>Finalizadas</dt>
+        <dd>{{ stats().finished }}</dd>
+      </div>
+    </dl>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <form class="surface-card assignments__filters" [formGroup]="filterForm" novalidate>
+    <label class="form-field">
+      <span>Búsqueda</span>
+      <input class="form-control" type="search" formControlName="search" placeholder="Buscar por título o descripción" />
+    </label>
+    <label class="form-field">
+      <span>Estado</span>
+      <select class="form-control" formControlName="status">
+        <option value="todas">Todas</option>
+        <option value="proximas">Próximas</option>
+        <option value="en-curso">En curso</option>
+        <option value="finalizadas">Finalizadas</option>
+      </select>
+    </label>
+    <button class="btn btn-ghost" type="button" (click)="resetFilters()">Limpiar filtros</button>
+  </form>
+
+  <section class="surface-card assignments__list" aria-live="polite">
+    @if (!filteredAssignments().length) {
+      <div class="assignments__empty">
+        <h2>No hay asambleas para mostrar</h2>
+        <p class="helper">Prueba ajustar los filtros o vuelve más tarde para ver nuevas asignaciones.</p>
+      </div>
+    } @else {
+      <ul>
+        @for (assembly of filteredAssignments(); track assembly.id) {
+          <li>
+            <article class="assignment">
+              <div class="assignment__status">
+                <span class="badge" [ngClass]="badgeClass(assembly.status)">{{ statusLabel(assembly.status) }}</span>
+                <time [attr.datetime]="assembly.startAt">{{ assembly.startAt | date: 'medium' }}</time>
+              </div>
+              <h2>{{ assembly.title }}</h2>
+              <p>{{ assembly.description }}</p>
+              <div class="assignment__meta">
+                <span>Inicio: {{ assembly.startAt | date: 'mediumDate' }}</span>
+                <span>Fin: {{ assembly.endAt | date: 'mediumDate' }}</span>
+              </div>
+              <button class="btn btn-primary" type="button" (click)="goToDetail(assembly.id)">
+                Ver detalle
+              </button>
+            </article>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</section>
+
+<ng-template #loading>
+  <div class="assignments__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando asambleas…</p>
+  </div>
+</ng-template>

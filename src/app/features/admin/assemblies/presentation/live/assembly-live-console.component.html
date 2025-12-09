@@ -1,0 +1,162 @@
+<section class="live-console" *ngIf="!isLoading(); else loading">
+  @let state = liveState();
+
+  <header class="live-console__header">
+    <div>
+      <a class="link" [routerLink]="['/admin', 'assemblies', assemblyId()]">&larr; Volver a la asamblea</a>
+      <h1>Consola en vivo</h1>
+      <p class="helper">Controla la sesión en tiempo real, abre/cierra preguntas y monitorea el conteo de votos.</p>
+    </div>
+    <div class="live-console__actions">
+      <button class="btn btn-ghost" type="button" (click)="cancel()">Salir</button>
+      <button class="btn btn-secondary" type="button" [disabled]="!state || state.isLive || !state.canStart" (click)="startAssembly()">
+        Iniciar asamblea
+      </button>
+      <button class="btn btn-secondary" type="button" [disabled]="!state || !state.canClose" (click)="closeAssembly()">
+        Cerrar asamblea
+      </button>
+      <button class="btn btn-ghost" type="button" [disabled]="!state || !agenda().length" (click)="advanceTopic()">
+        Siguiente topic
+      </button>
+      <button class="btn btn-primary" type="button" [disabled]="isSaving()" (click)="saveLiveState()">
+        @if (isSaving()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Guardando…</span>
+        } @else {
+          <span>Guardar estado</span>
+        }
+      </button>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="feedback feedback--success" role="status">{{ successMessage() }}</p>
+  }
+
+  <section class="surface-card live-console__overview" *ngIf="state as live">
+    <div class="overview__status">
+      <span class="badge" [class]="live.isLive ? 'badge--running' : 'badge--ghost'">
+        {{ live.isLive ? 'En curso' : 'En espera' }}
+      </span>
+      <p class="helper">Topic actual: {{ currentTopic()?.title || 'Sin asignar' }}</p>
+      <p class="helper">Pregunta activa: {{ currentQuestion()?.questionId || 'Sin pregunta abierta' }}</p>
+    </div>
+    <div class="overview__grid">
+      <div>
+        <span class="helper">Inicio</span>
+        <strong>{{ live.startedAt ? (live.startedAt | date: 'medium') : 'Sin iniciar' }}</strong>
+      </div>
+      <div>
+        <span class="helper">Cierre</span>
+        <strong>{{ live.closedAt ? (live.closedAt | date: 'medium') : 'Sin cerrar' }}</strong>
+      </div>
+      <div>
+        <span class="helper">Puede iniciar</span>
+        <strong>{{ live.canStart ? 'Sí' : 'No' }}</strong>
+      </div>
+      <div>
+        <span class="helper">Puede cerrar</span>
+        <strong>{{ live.canClose ? 'Sí' : 'No' }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface-card live-console__topics">
+    <header class="section-header">
+      <h2>Topics y preguntas</h2>
+      <p class="helper">Revisa el estado de cada pregunta y controla su ventana de votación.</p>
+    </header>
+
+    @if (!topicsWithState().length) {
+      <div class="live-console__empty">
+        <h3>No hay topics configurados</h3>
+        <p class="helper">Agrega topics y preguntas desde la configuración general.</p>
+      </div>
+    } @else {
+      <ul class="topic-list">
+        @for (item of topicsWithState(); track item.topic.id) {
+          <li class="topic-card" [class.topic-card--current]="item.topic.id === state?.currentTopicId">
+            <header class="topic-card__header">
+              <div>
+                <span class="badge badge--ghost">Topic</span>
+                <h3>{{ item.topic.title }}</h3>
+                @if (item.topic.startAt) {
+                  <p class="helper">{{ item.topic.startAt | date: 'medium' }} - {{ item.topic.endAt | date: 'medium' }}</p>
+                }
+              </div>
+            </header>
+
+            <ul class="question-list">
+              @for (entry of item.questions; track entry.question.id) {
+                <li class="question-row" [class.question-row--active]="entry.state?.status === 'activa'">
+                  <div class="question-row__info">
+                    <h4>{{ entry.question.text }}</h4>
+                    <p class="helper">Estado: {{ questionStatusLabel(entry.state?.status || entry.question.status || 'programada') }}</p>
+                    @if (entry.state?.votingWindowStart) {
+                      <p class="helper">Inicio: {{ entry.state?.votingWindowStart | date: 'short' }}</p>
+                    }
+                    @if (entry.state?.votingWindowEnd) {
+                      <p class="helper">Cierre: {{ entry.state?.votingWindowEnd | date: 'short' }}</p>
+                    }
+                  </div>
+                  <div class="question-row__metrics">
+                    <div>
+                      <span class="helper">Sí</span>
+                      <strong>{{ entry.state?.yes ?? 0 }}</strong>
+                    </div>
+                    <div>
+                      <span class="helper">No</span>
+                      <strong>{{ entry.state?.no ?? 0 }}</strong>
+                    </div>
+                    <div>
+                      <span class="helper">Abstenciones</span>
+                      <strong>{{ entry.state?.abstain ?? 0 }}</strong>
+                    </div>
+                  </div>
+                  <div class="question-row__actions">
+                    <button
+                      type="button"
+                      class="btn btn-ghost"
+                      [disabled]="entry.state?.status === 'activa'"
+                      (click)="openQuestion(entry.question.id)"
+                    >
+                      Abrir
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-ghost"
+                      [disabled]="entry.state?.status !== 'activa'"
+                      (click)="closeQuestion(entry.question.id)"
+                    >
+                      Cerrar
+                    </button>
+                    @if (canUseTieBreaker(entry.state)) {
+                      <div class="tie-breaker">
+                        <span class="helper">Empate detectado</span>
+                        <div class="tie-breaker__actions">
+                          <button type="button" class="btn btn-secondary" (click)="applyTieBreaker(entry.question.id, 'si')">Desempatar con Sí</button>
+                          <button type="button" class="btn btn-secondary" (click)="applyTieBreaker(entry.question.id, 'no')">Desempatar con No</button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</section>
+
+<ng-template #loading>
+  <div class="live-console__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando consola en vivo…</p>
+  </div>
+</ng-template>

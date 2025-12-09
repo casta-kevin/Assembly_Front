@@ -1,0 +1,144 @@
+<section class="assembly-form" *ngIf="!isLoading(); else loading">
+  <header class="assembly-form__header">
+    <div>
+      <a class="link" [routerLink]="['/admin', 'assemblies']">&larr; Volver al listado</a>
+      <h1>{{ isNew() ? 'Crear asamblea' : 'Editar asamblea' }}</h1>
+      <p class="helper">Gestiona la configuración general, reglas y orden del día.</p>
+    </div>
+    <div class="assembly-form__actions">
+      <button class="btn btn-ghost" type="button" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-primary" type="button" [disabled]="isSaving()" (click)="save()">
+        @if (isSaving()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Guardando…</span>
+        } @else {
+          <span>Guardar asamblea</span>
+        }
+      </button>
+    </div>
+  </header>
+
+  @if (!isNew()) {
+    <nav class="assembly-form__shortcuts">
+      <span class="helper">Accesos rápidos</span>
+      <div class="assembly-form__shortcut-links">
+        <a class="pill pill--link" [routerLink]="['/admin', 'assemblies', assemblyId(), 'participants']">Participantes</a>
+        <a class="pill pill--link" [routerLink]="['/admin', 'assemblies', assemblyId(), 'live']">Consola en vivo</a>
+        <a class="pill pill--link" [routerLink]="['/admin', 'assemblies', assemblyId(), 'history']">Historial</a>
+        @if (firstTopicId()) {
+          <a class="pill pill--link" [routerLink]="['/admin', 'assemblies', assemblyId(), 'questions', firstTopicId()]">Preguntas por topic</a>
+        }
+      </div>
+    </nav>
+  }
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="feedback feedback--success" role="status">{{ successMessage() }}</p>
+  }
+
+  <form [formGroup]="form" class="assembly-form__grid" novalidate>
+    <section class="surface-card">
+      <header class="section-header">
+        <h2>Información general</h2>
+        <p class="helper">Datos visibles para todos los participantes.</p>
+      </header>
+      <div class="section-grid">
+        <div class="form-field">
+          <label for="title">Título</label>
+          <input id="title" class="form-control" type="text" formControlName="title" placeholder="Asamblea extraordinaria de seguridad" />
+        </div>
+        <div class="form-field">
+          <label for="description">Descripción</label>
+          <textarea id="description" class="form-control" rows="4" formControlName="description" placeholder="Describe el objetivo general de la asamblea."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="surface-card">
+      <header class="section-header">
+        <h2>Reglas y quorum</h2>
+        <p class="helper">Define las condiciones generales de votación.</p>
+      </header>
+      <div class="section-grid">
+        <div class="form-field">
+          <label for="rules">Reglas</label>
+          <textarea id="rules" class="form-control" rows="6" formControlName="rules" placeholder="Describe el quorum, reglas de desempate y criterios de aprobación."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="surface-card">
+      <header class="section-header">
+        <h2>Programación</h2>
+        <p class="helper">Horarios planificados de la asamblea.</p>
+      </header>
+      <div class="section-grid section-grid--two">
+        <div class="form-field">
+          <label for="startAt">Fecha y hora de inicio</label>
+          <input id="startAt" class="form-control" type="datetime-local" formControlName="startAt" />
+        </div>
+        <div class="form-field">
+          <label for="endAt">Fecha y hora de cierre</label>
+          <input id="endAt" class="form-control" type="datetime-local" formControlName="endAt" />
+        </div>
+        <div class="form-field">
+          <label for="status">Estado</label>
+          <select id="status" class="form-control" formControlName="status">
+            @for (option of statusOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="surface-card">
+      <header class="section-header">
+        <h2>Responsables de inicio</h2>
+        <p class="helper">Selecciona quién puede dar inicio formal a la asamblea.</p>
+      </header>
+      <div class="section-grid section-grid--two">
+        <div class="form-field form-field--switch">
+          <label class="switch">
+            <input type="checkbox" formControlName="canManageInitiators" />
+            <span>Permitir agregar responsables hasta antes del inicio</span>
+          </label>
+        </div>
+        <div class="form-field">
+          <label>Responsables habilitados</label>
+          <div class="pill-list">
+            @for (user of availableInitiators; track user.id) {
+              <button type="button" class="pill pill--toggle" [class.pill--selected]="initiatorSelected(user.id)" (click)="toggleInitiator(user.id)">
+                {{ user.name }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="surface-card">
+      <header class="section-header">
+        <h2>Orden del día</h2>
+        <p class="helper">Topics, horarios y preguntas de votación.</p>
+      </header>
+      <app-agenda-manager
+        [agenda]="agenda"
+        [maxTieBreakersEnabled]="true"
+        (addTopicRequested)="addEmptyTopic()"
+        (removeTopicRequested)="removeTopic($event)"
+      ></app-agenda-manager>
+    </section>
+  </form>
+</section>
+
+<ng-template #loading>
+  <div class="assembly-form__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando información…</p>
+  </div>
+</ng-template>

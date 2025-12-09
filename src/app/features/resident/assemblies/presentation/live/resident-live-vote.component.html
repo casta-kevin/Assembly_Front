@@ -1,0 +1,76 @@
+<section class="live-vote" *ngIf="!isLoading(); else loading">
+  <header class="live-vote__header">
+    <div>
+      @if (assemblyId) {
+        <a class="link" [routerLink]="['/resident', 'assemblies', assemblyId]">&larr; Volver al detalle</a>
+      }
+      <h1>Votación en vivo</h1>
+      <p class="helper">Emite tu voto cuando la pregunta esté activa. La vista se actualiza automáticamente.</p>
+    </div>
+    <div class="live-vote__actions">
+      <button class="btn btn-ghost" type="button" (click)="refresh()" [disabled]="isSubmitting()">Actualizar</button>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="feedback feedback--success" role="status">{{ successMessage() }}</p>
+  }
+
+  <section class="surface-card live-vote__content">
+    @if (question(); as current) {
+      <header class="live-vote__question">
+        <span class="badge" [ngClass]="{
+          'badge--running': current.status === 'activa',
+          'badge--ghost': current.status === 'programada',
+          'badge--finished': current.status === 'cerrada'
+        }">{{ current.status | titlecase }}</span>
+        <time [attr.datetime]="current.closesAt">Termina: {{ current.closesAt | date: 'medium' }}</time>
+      </header>
+
+      <p class="live-vote__topic">{{ current.topicTitle }}</p>
+      <h2>{{ current.questionText }}</h2>
+      @if (current.questionDescription) {
+        <p class="helper">{{ current.questionDescription }}</p>
+      }
+
+      <p class="live-vote__state" [class.live-vote__state--warning]="!canVote()">{{ stateMessage() }}</p>
+
+      <div class="live-vote__buttons" role="group" aria-label="Opciones de voto">
+        <button class="btn btn-primary" type="button" (click)="vote('si')" [disabled]="!canVote()">Votar Sí</button>
+        <button class="btn btn-ghost" type="button" (click)="vote('no')" [disabled]="!canVote()">Votar No</button>
+        <button class="btn btn-ghost" type="button" (click)="vote('abstencion')" [disabled]="!canVote()">Abstenerse</button>
+      </div>
+
+      <dl class="live-vote__results" aria-label="Resultados parciales">
+        <div>
+          <dt>Sí</dt>
+          <dd>{{ current.totalYes }}</dd>
+        </div>
+        <div>
+          <dt>No</dt>
+          <dd>{{ current.totalNo }}</dd>
+        </div>
+        <div>
+          <dt>Abstenciones</dt>
+          <dd>{{ current.totalAbstain }}</dd>
+        </div>
+      </dl>
+    } @else {
+      <div class="live-vote__empty">
+        <h2>No hay preguntas activas</h2>
+        <p class="helper">Cuando se active una votación, la información aparecerá automáticamente en esta pantalla.</p>
+      </div>
+    }
+  </section>
+</section>
+
+<ng-template #loading>
+  <div class="surface-card live-vote__loading">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando votación…</p>
+  </div>
+</ng-template>

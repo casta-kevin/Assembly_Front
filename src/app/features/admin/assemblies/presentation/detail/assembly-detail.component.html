@@ -1,0 +1,149 @@
+<section class="assembly-detail" *ngIf="!isLoading(); else loading">
+  <header class="assembly-detail__header">
+    <div>
+      <a class="link" [routerLink]="['/admin', 'assemblies', assemblyId()]">&larr; Volver a la asamblea</a>
+      <h1>Resumen y historial</h1>
+      <p class="helper">Consulta la información oficial, el registro de eventos y los resultados de votación.</p>
+    </div>
+    <button class="btn btn-ghost" type="button" (click)="cancel()">Cerrar</button>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (assembly(); as detail) {
+    <section class="surface-card assembly-detail__summary">
+      <header class="section-header">
+        <h2>{{ detail.title }}</h2>
+        <span class="badge" [class]="detail.status === 'finalizada' || detail.status === 'cerrada' ? 'badge--finished' : 'badge--ghost'">
+          {{ statusLabel(detail.status) }}
+        </span>
+      </header>
+      <div class="summary__grid">
+        <div>
+          <span class="helper">Descripción</span>
+          <p>{{ detail.description }}</p>
+        </div>
+        <div>
+          <span class="helper">Reglas</span>
+          <p>{{ detail.rules }}</p>
+        </div>
+        <div>
+          <span class="helper">Inicio</span>
+          <strong>{{ detail.startAt | date: 'medium' }}</strong>
+        </div>
+        <div>
+          <span class="helper">Fin</span>
+          <strong>{{ detail.endAt | date: 'medium' }}</strong>
+        </div>
+        <div>
+          <span class="helper">Creada por</span>
+          <strong>{{ detail.createdBy }}</strong>
+        </div>
+        <div>
+          <span class="helper">Última actualización</span>
+          <strong>{{ detail.updatedAt | date: 'medium' }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="surface-card assembly-detail__timeline">
+      <header class="section-header">
+        <h2>Eventos de la asamblea</h2>
+        <p class="helper">Registro cronológico de hitos durante la sesión.</p>
+      </header>
+      @if (!history().events.length) {
+        <p class="helper">No hay eventos registrados aún.</p>
+      } @else {
+        <ol class="timeline">
+          @for (event of history().events; track event.timestamp) {
+            <li class="timeline__item">
+              <div class="timeline__point"></div>
+              <div>
+                <p class="timeline__meta">{{ event.timestamp | date: 'medium' }} · {{ event.actor }}</p>
+                <p>{{ event.description }}</p>
+              </div>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+
+    <section class="surface-card assembly-detail__results">
+      <header class="section-header">
+        <h2>Resultados de votación</h2>
+        <p class="helper">Conteo consolidado por pregunta incluyendo votos Sí/No/Abstención.</p>
+      </header>
+      @if (!questionResults().length) {
+        <p class="helper">Aún no hay resultados registrados.</p>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Topic</th>
+              <th>Pregunta</th>
+              <th>Sí</th>
+              <th>No</th>
+              <th>Abstenciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (result of questionResults(); track result.questionId) {
+              <tr>
+                <td>{{ result.topic?.title || 'Topic' }}</td>
+                <td>{{ result.question?.text || result.questionText }}</td>
+                <td>{{ result.yes }}</td>
+                <td>{{ result.no }}</td>
+                <td>{{ result.abstain }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
+    <section class="surface-card assembly-detail__votes">
+      <header class="section-header">
+        <h2>Registro de votos</h2>
+        <p class="helper">Detalle de votos emitidos por participante, sujeto a políticas de privacidad.</p>
+      </header>
+      @if (!flattenedVotes().length) {
+        <p class="helper">No se han registrado votos individuales.</p>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Participante</th>
+              <th>Unidad</th>
+              <th>Pregunta</th>
+              <th>Voto</th>
+              <th>Emisión</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (vote of flattenedVotes(); track vote.participantId + vote.emittedAt) {
+              <tr>
+                <td>{{ vote.participantName }}</td>
+                <td>{{ vote.participantUnit || '—' }}</td>
+                <td>
+                  <span class="helper">{{ vote.topicTitle }}</span>
+                  <span>{{ vote.questionText }}</span>
+                </td>
+                <td>{{ choiceLabel(vote.choice) }}</td>
+                <td>{{ vote.emittedAt | date: 'medium' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+  }
+</section>
+
+<ng-template #loading>
+  <div class="assembly-detail__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando historial…</p>
+  </div>
+</ng-template>

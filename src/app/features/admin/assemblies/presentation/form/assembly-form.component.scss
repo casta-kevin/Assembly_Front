@@ -1,0 +1,138 @@
+:host {
+  display: block;
+  padding: var(--space-lg);
+}
+
+.assembly-form {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.assembly-form__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.assembly-form__header h1 {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  margin-top: var(--space-2xs);
+}
+
+.assembly-form__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.assembly-form__shortcuts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.assembly-form__shortcut-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.pill--link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.assembly-form__grid {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.surface-card {
+  padding: var(--space-lg);
+  display: grid;
+  gap: var(--space-md);
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+}
+
+.section-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.section-grid--two {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.form-field--switch {
+  display: flex;
+  align-items: center;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-weight: 600;
+}
+
+.switch input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--color-primary-600);
+}
+
+.pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.pill {
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: var(--font-size-sm);
+  transition: background-color var(--transition-base), color var(--transition-base), transform var(--transition-base);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background-color: rgba(99, 102, 241, 0.1);
+  color: var(--color-primary-600);
+}
+
+.pill--toggle:hover {
+  transform: translateY(-1px);
+}
+
+.pill--selected {
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-500));
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.assembly-form__loading {
+  margin: var(--space-lg);
+  display: grid;
+  place-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-lg);
+}
+
+@media (max-width: 960px) {
+  :host {
+    padding: var(--space-md);
+  }
+
+  .assembly-form__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .assembly-form__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

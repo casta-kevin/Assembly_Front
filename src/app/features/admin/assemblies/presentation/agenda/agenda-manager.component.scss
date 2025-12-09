@@ -1,0 +1,119 @@
+.agenda {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.agenda__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.agenda__list {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.agenda__item {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  background-color: rgba(15, 23, 42, 0.35);
+  box-shadow: var(--shadow-sm);
+}
+
+.agenda__item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.agenda__item-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.agenda__item-title h4 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.agenda__drag {
+  cursor: grab;
+  font-size: 1.2rem;
+  opacity: 0.65;
+}
+
+.agenda__item-grid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.agenda__questions {
+  margin-top: var(--space-md);
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.agenda__questions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.question {
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  padding: var(--space-sm);
+  background-color: rgba(15, 23, 42, 0.3);
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.question__grid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.question__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--font-size-sm);
+}
+
+.switch input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--color-primary-600);
+}
+
+[cdkdragpreview] {
+  box-sizing: border-box;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 768px) {
+  .agenda__item {
+    padding: var(--space-sm);
+  }
+
+  .question__grid {
+    grid-template-columns: 1fr;
+  }
+}

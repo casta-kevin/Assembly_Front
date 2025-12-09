@@ -1,0 +1,48 @@
+<section class="notifications" *ngIf="!isLoading(); else loading">
+  <header class="notifications__header">
+    <div>
+      <h1>Centro de notificaciones</h1>
+      <p class="helper">Consulta las novedades de tus asambleas asignadas y accede rápidamente a su detalle.</p>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <section class="surface-card notifications__list" aria-live="polite">
+    @if (!notifications().length) {
+      <div class="notifications__empty">
+        <h2>No tienes notificaciones</h2>
+        <p class="helper">Cuando seas asignado a una nueva asamblea, verás la información aquí.</p>
+      </div>
+    } @else {
+      <ul>
+        @for (notification of notifications(); track notification.id) {
+          <li>
+            <article class="notification" [class.notification--read]="notification.read">
+              <div class="notification__status">
+                <span class="badge" [ngClass]="badgeClass(notification.status)">{{ statusLabel(notification.status) }}</span>
+                <time [attr.datetime]="notification.startAt">{{ notification.startAt | date: 'mediumDate' }}</time>
+              </div>
+              <div class="notification__body">
+                <h2>{{ notification.title }}</h2>
+                <p>{{ notification.summary }}</p>
+                <button class="btn btn-primary" type="button" (click)="openAssembly(notification)">
+                  Ver asamblea
+                </button>
+              </div>
+            </article>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</section>
+
+<ng-template #loading>
+  <div class="notifications__loading surface-card">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Cargando notificaciones…</p>
+  </div>
+</ng-template>
