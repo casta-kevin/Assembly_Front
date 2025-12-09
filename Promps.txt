@@ -1,0 +1,68 @@
+Utilizando clean arquitecture, crea un login moderno e intuitivo que brinde buena experiencia de usuario, crea estilos globales para no reescribir codigo, todo debe ser reactivo
+
+Basado en las siguientes historias de usuario:
+
+HU Asambleas ADMINISTRADOR El sistema debe permitir al usuario administrador crear una nueva asamblea en un formulario de creación, el formulario debe tener Descripción, Reglas, Orden del día. El sistema debe permitir organizar a necesidad del administrador el orden de los topics que se van a tratar en la asamblea. El sistema debe permitir registrar una fecha de inicio y una fecha de fin para cada topics. El sistema debe permitir registrar preguntas de SI/NO en cada topic. El sistema debe permitir al administrador registrar su voto únicamente cuando se encuentre en empate alguna pregunta. El sistema debe permitir al administrador configurar las personas que pueden realizar el voto de dar inicio a la asamblea, es decir, si la asamblea ya dio inicio, este le debe restringir poder agregar mas personas a la asamblea. RESIDENTE El sistema debe notificar a los usuarios asignador a la asamblea, que fueron asignados a una asamblea, debe mostrar fecha de inicio de la asamblea y los topics de la misma. El sistema debe permitir ver el listado de asambleas al cual el usuario se encuentra asignado. El sistema debe permitir ver el detalle de la asamblea seleccionada en el historial, únicamente se deme mostrar la fecha de inicio, la fecha final, descripción y topics. El sistema debe permitir mostrar al usuario asignado a la asamblea registrar su voto cuando el sistema le indique, esto solo puede ocurrir mientras esta la asamblea en proceso y mientras se muestra la pregunta. El sistema debe restringir al usuario no realizar el boto si la pregunta de la asamblea ya fue procesada, es decir al finalizar la pregunta ya no se pueden registrar mas votos a este. El sistema debe mostrar automáticamente el topics que se esta tratando en ese momento y/o la pregunta, es decir en el momento que se este tratando el tema y/o la pregunta esta debe abrirle automáticamente en el dispositivo que se encuentre el usuario, si es una pregunta este debe mostrar la fecha de finalización de la pregunta y permitirle votar. El sistema debe almacenar auditoria de todas las operaciones que se realicen incluyendo las descargas de los archivos. Para desarrollar una aplicacion basada en estas historias de usuario, que vistas necesita el frontend ?
+
+Crea las siguientes vistas:
+
+Vistas para ADMINISTRADOR
+
+Vista / Pantalla Rol Descripción funcional
+1 Listado de asambleas Admin Tabla/lista de todas las asambleas (próximas, en curso, finalizadas) con filtros y acciones: ver, editar (si aplica), gestionar, ver historial.
+2 Crear/Editar asamblea Admin Formulario con: Descripción, Reglas, Orden del día (lista de topics), configuración general (fechas de la asamblea, estado). Permite crear/editar asamblea.
+3 Gestión de orden del día (topics) Admin Subvista (dentro de crear/editar asamblea o modal) para: crear/editar/eliminar topics, definir su orden (drag & drop), y registrar fecha de inicio/fin planificada por topic.
+
+Vistas Administrador
+
+Listado de asambleas: tabla con filtros (estado, rango de fechas, texto). Acciones: Ver detalle/Gestionar, Editar (solo si no ha iniciado), Duplicar, Cerrar (si aplica). KPI cards con próximas/en curso/finalizadas. Botón primario “Crear asamblea”. Estado vacío con CTA. Soporta paginación y búsqueda.
+Crear/Editar asamblea: formulario dividido en secciones (“Información general”, “Reglas”, “Orden del día”, “Configuración de participantes”). Incluye campos obligatorios, validaciones, autosave/borrador, vista previa. Desde aquí se accede a subvista de topics, se definen fechas globales y estado (borrador/publicada).
+Gestión de orden del día (topics): panel/overlay dentro de la edición con lista drag & drop. Cada topic editable (título, descripción, fechas inicio/fin planificadas, preguntas SI/NO con reglas de quorum y empate, documentos adjuntos). Permite añadir/eliminar temas y reordenar; controla conflictos de fechas y confirma eliminaciones.
+Otras vistas y componentes sugeridos
+
+Configuración de habilitados para iniciar: submodulo en edición con selector múltiple, búsqueda y estado bloqueado tras inicio de asamblea.
+Gestión de preguntas: modal reutilizable para crear/editar preguntas con tiempos, reglas de empate y visibilidad.
+Historial/Auditoría: tabla con filtro por acción/usuario/fecha y descarga de logs para cumplimiento.
+Notificaciones: bandeja para ver alertas enviadas a residentes y reenviarlas si es necesario.
+Vistas Residente
+
+Mis asambleas: listado tarjetas/tabla con estado (Próxima/En curso/Finalizada), fecha inicio, CTA “Ir a asamblea”.
+Detalle de asamblea: resume descripción, fechas, reglas y lista de topics con estado (pendiente, en curso, cerrado).
+Experiencia en vivo: vista reactiva que abre automáticamente el topic/pregunta activa mediante canal en tiempo real. Muestra tiempo restante, botones voto Sí/No, confirmación y bloqueo al cerrar. Incluye historial del topic y fallback si se pierde conexión.
+Historial de votos: opcional según políticas, permite al residente revisar sus participaciones (sin violar anonimato).
+Notificaciones: toasts o centro de notificaciones para avisos de asignación e inicio.
+Cross cutting
+
+Barra superior con selector de rol (si usan la misma app), indicador de estado en vivo, y accesos a auditoría/ayuda.
+Componentes compartidos: timeline de topics, tarjetas de estado, modal confirmación, indicadores de conteo en vivo, spinner global.
+Integraciones: servicio de notificaciones push, sockets/polling para actualizar estado, guardas de ruta según rol/estado, interceptores para auditoría.
+Con estas vistas el frontend cubre todas las historias, manteniendo modularidad y soporte para la arquitectura limpia (feature modules separados por rol, servicios de estado, data mappers y repositorios).
+
+Ahora crea las siguientes vistas:
+
+4 Gestión de preguntas por topic Admin Subvista asociada a un topic para configurar las preguntas de tipo Sí/No, su texto, fechas de inicio/fin de votación de cada pregunta y estado (programada, activa, cerrada).
+5 Configuración de participantes de la asamblea Admin Pantalla para asignar residentes/propietarios a la asamblea, definir quiénes pueden votar el inicio de la asamblea, y visualizar el estado de asignación. Una vez la asamblea inicia, bloquea agregar más participantes.
+6 Consola en vivo de la asamblea Admin Vista de control “en tiempo real”: iniciar/cerrar asamblea, ver el topic actual, abrir/cerrar preguntas, ver conteo de votos en vivo, avanzar al siguiente topic. Debe permitir al administrador registrar su voto solo cuando haya empate en alguna pregunta.
+7 Detalle/historial de asamblea Admin Vista de solo lectura con resumen: fechas inicio/fin, descripción, reglas, topics, preguntas y resultados de votación por pregunta, incluyendo registros de quién votó qué (según política de privacidad).
+
+
+Ahora crea las siguientes funciones:
+
+8 Auditoría de operaciones Admin Lista de eventos de auditoría relacionados con asambleas: creación/edición, cambios en participantes, apertura/cierre de preguntas, votos del administrador, descargas de archivos, etc., con filtros por fecha, usuario, tipo de acción.
+9 Gestor de archivos de la asamblea (opcional según alcance) Admin Vista para listar y descargar documentos asociados a la asamblea (actas, anexos, presentaciones). Toda descarga dispara registro en auditoría.
+
+
+Ahora crea las siguientes funciones para un usuario de tipo residente:
+Vistas para RESIDENTE
+
+Vista / Pantalla Rol Descripción funcional
+1 Centro de notificaciones Residente Lista de notificaciones donde el usuario ve que fue asignado a una asamblea, con fecha de inicio y resumen. Desde aquí puede ir al detalle de la asamblea.
+2 Listado de asambleas asignadas Residente Lista de asambleas a las que el usuario está asignado (próximas, en curso y pasadas), con estado y fechas de inicio/fin.
+3 Detalle de asamblea (historial) Residente Para asambleas finalizadas: muestra solo fecha de inicio, fecha final, descripción y topics (sin permitir votar). Cumple la restricción de “solo lectura” del historial.
+
+Ahora crea las siguientes funciones para el rol residente:
+
+4 Detalle de asamblea en curso Residente Para asambleas en proceso: muestra info general (fechas, descripción, topics) y el topic/pregunta actual que se esté tratando cuando sea su turno de votar.
+5 Pantalla de votación en vivo (topic/pregunta) Residente Vista que se abre automáticamente (o se actualiza) cuando hay un topic/pregunta activa: muestra el topic actual, el texto de la pregunta Sí/No, la fecha/hora de finalización de la pregunta, botones de voto, estado del voto enviado. Debe impedir votar cuando la pregunta ya fue procesada/cerrada.
+6 Mensajes de estado/bloqueo de voto Residente Puede ser una subvista/modal/mensaje dentro de la pantalla de votación para indicar: “pregunta cerrada”, “ya votaste”, “pregunta aún no activa”, etc. Asegura la restricción de no permitir votos fuera del tiempo válido.
+
