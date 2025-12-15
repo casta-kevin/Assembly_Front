@@ -3,7 +3,7 @@
     <div>
       <a class="link" [routerLink]="['/admin', 'assemblies']">&larr; Volver al listado</a>
       <h1>{{ isNew() ? 'Crear asamblea' : 'Editar asamblea' }}</h1>
-      <p class="helper">Gestiona la configuración general, reglas y orden del día.</p>
+      <p class="helper">Gestiona la configuración general y reglas. El orden del día ahora vive en una vista separada.</p>
     </div>
     <div class="assembly-form__actions">
       <button class="btn btn-ghost" type="button" (click)="cancel()">Cancelar</button>
@@ -121,17 +121,30 @@
       </div>
     </section>
 
-    <section class="surface-card">
+    <section class="surface-card surface-card--agenda-link">
       <header class="section-header">
         <h2>Orden del día</h2>
-        <p class="helper">Topics, horarios y preguntas de votación.</p>
+        <p class="helper">Diseña los topics y preguntas desde la vista dedicada.</p>
       </header>
-      <app-agenda-manager
-        [agenda]="agenda"
-        [maxTieBreakersEnabled]="true"
-        (addTopicRequested)="addEmptyTopic()"
-        (removeTopicRequested)="removeTopic($event)"
-      ></app-agenda-manager>
+      <div class="agenda-link">
+        <div class="agenda-link__copy">
+          <p>Primero guarda los cambios generales y luego continúa con la definición del orden del día.</p>
+          @if (isNew()) {
+            <p class="feedback feedback--info" role="status">Guarda la asamblea para habilitar esta sección.</p>
+          } @else {
+            <p class="helper">Puedes retomar el diseño cuando lo necesites.</p>
+          }
+        </div>
+        <button
+          class="btn btn-secondary"
+          type="button"
+          [disabled]="isNew()"
+          [routerLink]="['/admin', 'assemblies', 'agenda']"
+          [queryParams]="{ assemblyId: assemblyId() }"
+        >
+          Ir a Orden del día
+        </button>
+      </div>
     </section>
   </form>
 </section>

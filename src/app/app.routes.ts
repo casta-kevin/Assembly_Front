@@ -11,6 +11,7 @@ import { AssemblyLiveConsoleComponent } from './features/admin/assemblies/presen
 import { AssemblyDetailComponent } from './features/admin/assemblies/presentation/detail/assembly-detail.component';
 import { AssemblyAuditComponent } from './features/admin/assemblies/presentation/audit/assembly-audit.component';
 import { AssemblyFilesComponent } from './features/admin/assemblies/presentation/files/assembly-files.component';
+import { AssemblyAgendaComponent } from './features/admin/assemblies/presentation/agenda/assembly-agenda.component';
 import { provideResidentAssembliesFeature } from './features/resident/assemblies/assemblies.providers';
 import { ResidentNotificationsComponent } from './features/resident/assemblies/presentation/notifications/resident-notifications.component';
 import { ResidentAssembliesListComponent } from './features/resident/assemblies/presentation/list/resident-assemblies-list.component';
@@ -35,8 +36,16 @@ export const routes: Routes = [
 						component: AssembliesListComponent,
 					},
 					{
+						path: 'agenda',
+						component: AssemblyAgendaComponent,
+					},
+					{
 						path: 'new',
 						component: AssemblyFormComponent,
+					},
+					{
+						path: ':id/agenda',
+						component: AssemblyAgendaComponent,
 					},
 					{
 						path: ':id/questions/:topicId',

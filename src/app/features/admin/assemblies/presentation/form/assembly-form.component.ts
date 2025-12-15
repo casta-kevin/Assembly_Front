@@ -13,12 +13,11 @@ import {
   AssemblyStatus,
   TopicQuestion,
 } from '../../../assemblies/domain/entities/assembly';
-import { AgendaManagerComponent } from '../agenda/agenda-manager.component';
 
 @Component({
   selector: 'app-assembly-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, AgendaManagerComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './assembly-form.component.html',
   styleUrl: './assembly-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -99,35 +98,6 @@ export class AssemblyFormComponent {
     } else {
       array.removeAt(index);
     }
-  }
-
-  protected addEmptyTopic(): void {
-    this.agenda.push(this.buildTopicGroup());
-  }
-
-  protected removeTopic(index: number): void {
-    this.agenda.removeAt(index);
-    if (!this.agenda.length) {
-      this.addEmptyTopic();
-    }
-  }
-
-  protected upsertTopic(index: number, topic: AgendaTopic): void {
-    const target = this.agenda.at(index);
-    if (target) {
-      target.patchValue({
-        id: topic.id,
-        title: topic.title,
-        description: topic.description ?? '',
-        startAt: topic.startAt ?? '',
-        endAt: topic.endAt ?? '',
-      });
-    }
-  }
-
-  protected reorderAgenda(order: AgendaTopic[]): void {
-    this.agenda.clear();
-    order.forEach((topic) => this.agenda.push(this.buildTopicGroup(topic)));
   }
 
   protected firstTopicId(): string | null {

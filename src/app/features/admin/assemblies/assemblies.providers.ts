@@ -5,6 +5,7 @@ import { GetAssemblyUseCase } from './application/use-cases/get-assembly.use-cas
 import { SaveAssemblyUseCase } from './application/use-cases/save-assembly.use-case';
 import { ASSEMBLIES_REPOSITORY } from './domain/repositories/assemblies.repository';
 import { HttpAssembliesRepository } from './infrastructure/repositories/http-assemblies.repository';
+import { SaveAgendaUseCase } from './application/use-cases/save-agenda.use-case';
 
 export function provideAssembliesFeature(): Provider[] {
   return [
@@ -12,5 +13,6 @@ export function provideAssembliesFeature(): Provider[] {
     LoadAssembliesUseCase,
     GetAssemblyUseCase,
     SaveAssemblyUseCase,
+    SaveAgendaUseCase,
   ];
 }

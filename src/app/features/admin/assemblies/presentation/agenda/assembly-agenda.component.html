@@ -1,0 +1,92 @@
+<section class="agenda-view">
+  <header class="agenda-view__header">
+    <div>
+      <a class="link" [routerLink]="['/admin', 'assemblies']">&larr; Volver al listado</a>
+      <h1>Orden del día</h1>
+      <p class="helper">Diseña los topics, horarios y preguntas de votación.</p>
+    </div>
+    <div class="agenda-view__actions">
+      <button class="btn btn-ghost" type="button" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-primary" type="button" [disabled]="isSaving()" (click)="saveAgenda()">
+        @if (isSaving()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Guardando…</span>
+        } @else {
+          <span>Guardar orden del día</span>
+        }
+      </button>
+    </div>
+  </header>
+
+  <section class="surface-card agenda-selector">
+    <header class="section-header">
+      <h2>Selecciona una asamblea</h2>
+      <p class="helper">Carga el orden del día que deseas editar.</p>
+    </header>
+    <div class="agenda-selector__content">
+      @if (isLoadingList()) {
+        <p class="helper">Cargando listado…</p>
+      } @else {
+        @if (assemblies().length) {
+          <div class="form-field">
+            <label for="assemblySelector">Asamblea</label>
+            <select
+              id="assemblySelector"
+              class="form-control"
+              (change)="selectAssembly($any($event.target).value)"
+            >
+              <option value="" disabled [selected]="!selectedAssembly()">Selecciona una opción</option>
+              @for (item of assemblies(); track item.id) {
+                <option [selected]="selectedAssembly()?.id === item.id" [value]="item.id">
+                  {{ item.title }} — {{ item.startAt | date: 'mediumDate' }}
+                </option>
+              }
+            </select>
+          </div>
+        } @else {
+          <p class="helper">No hay asambleas disponibles. Crea una nueva antes de definir el orden del día.</p>
+        }
+      }
+    </div>
+  </section>
+
+  @if (errorMessage()) {
+    <p class="feedback feedback--error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="feedback feedback--success" role="status">{{ successMessage() }}</p>
+  }
+
+  @if (isLoadingAgenda()) {
+    <div class="surface-card agenda-view__loading">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Cargando orden del día…</p>
+    </div>
+  } @else {
+    @if (selectedAssembly()) {
+      <section class="surface-card agenda-builder">
+        <header class="section-header">
+          <div>
+            <h2>{{ selectedAssembly()?.title }}</h2>
+            <p class="helper">
+              Ventana planificada: {{ selectedAssembly()?.startAt | date: 'short' }} – {{ selectedAssembly()?.endAt | date: 'short' }}
+            </p>
+          </div>
+          <button class="btn btn-secondary" type="button" (click)="addTopic()">Agregar topic</button>
+        </header>
+        <app-agenda-manager
+          [agenda]="agenda"
+          [maxTieBreakersEnabled]="true"
+          (addTopicRequested)="addTopic()"
+          (removeTopicRequested)="removeTopic($event)"
+        ></app-agenda-manager>
+      </section>
+    } @else {
+      <div class="surface-card agenda-view__empty">
+        <p>Selecciona una asamblea para comenzar a diseñar el orden del día.</p>
+        <p class="helper">Las modificaciones se guardarán exclusivamente en esta vista.</p>
+      </div>
+    }
+  }
+</section>

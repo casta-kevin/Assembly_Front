@@ -70,6 +70,31 @@ export class MockAssembliesRepository implements AssembliesRepository {
     return of(structuredClone(updated)).pipe(delay(250));
   }
 
+  saveAgenda(payload: { assemblyId: string; agenda: AgendaTopic[]; startAt: string; endAt: string }): Observable<void> {
+    const current = this.assemblies$.getValue();
+    const index = current.findIndex((item) => item.id === payload.assemblyId);
+
+    if (index === -1) {
+      return throwError(() => new Error('La asamblea seleccionada no existe.'));
+    }
+
+    const copy = structuredClone(current);
+    const target = copy[index];
+    const mode: 'upcoming' | 'current' | 'past' = target.status === 'INPR'
+      ? 'current'
+      : target.status === 'FNLC'
+        ? 'past'
+        : 'upcoming';
+
+    target.agenda = structuredClone(payload.agenda);
+    target.liveState = this.createLiveState(mode, target.agenda, target.history);
+    target.updatedAt = new Date().toISOString();
+
+    this.assemblies$.next(copy);
+
+    return of(void 0).pipe(delay(250));
+  }
+
   private applyFilters(data: AssemblySummary[], filters?: Partial<AssemblyFilters>): AssemblySummary[] {
     if (!filters) {
       return data;

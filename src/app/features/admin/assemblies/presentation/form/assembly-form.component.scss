@@ -56,10 +56,31 @@
   gap: var(--space-md);
 }
 
+.surface-card--agenda-link {
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.01);
+}
+
 .section-header h2 {
   margin: 0;
   font-size: clamp(var(--text-base), 2.4vw, var(--text-lg));
   color: var(--foreground);
+}
+
+.agenda-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.agenda-link__copy {
+  flex: 1;
+  min-width: 220px;
+  display: grid;
+  gap: var(--space-2xs);
+  color: var(--muted-foreground);
 }
 
 .section-grid {

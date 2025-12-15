@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, signal } from '@angular/core';
-import { Observable, map, of, switchMap } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 
 import { APP_API_BASE_URL } from '../../../../../config/api.config';
 import { AuthSessionService } from '../../../../auth/application/services/auth-session.service';
@@ -132,19 +132,19 @@ export class HttpAssembliesRepository implements AssembliesRepository {
 
   save(payload: AssemblyDetail): Observable<AssemblyDetail> {
     if (this.hasServerGeneratedId(payload.id)) {
-      return this.persistAgenda(payload.id, payload.agenda, payload.startAt, payload.endAt).pipe(map(() => payload));
+      return this.updateAssembly(payload).pipe(map(() => payload));
     }
 
     return this.createAssembly(payload).pipe(
-      switchMap((assemblyId) =>
-        this.persistAgenda(assemblyId, payload.agenda, payload.startAt, payload.endAt).pipe(
-          map(() => ({
-            ...payload,
-            id: assemblyId,
-          } satisfies AssemblyDetail)),
-        ),
-      ),
+      map((assemblyId) => ({
+        ...payload,
+        id: assemblyId,
+      } satisfies AssemblyDetail)),
     );
+  }
+
+  saveAgenda(payload: { assemblyId: string; agenda: AgendaTopic[]; startAt: string; endAt: string }): Observable<void> {
+    return this.persistAgenda(payload.assemblyId, payload.agenda, payload.startAt, payload.endAt);
   }
 
   private normalizeApiResponse<T>(response: ApiResponse<T>) {
@@ -158,13 +158,7 @@ export class HttpAssembliesRepository implements AssembliesRepository {
 
   private createAssembly(payload: AssemblyDetail): Observable<string> {
     const url = `${this.apiBaseUrl}/assemblies`;
-    const body: CreateAssemblyDto = {
-      title: payload.title,
-      description: payload.description || undefined,
-      rules: payload.rules || undefined,
-      startDatePlanned: payload.startAt,
-      endDatePlanned: payload.endAt,
-    };
+    const body = this.buildAssemblyRequestBody(payload);
 
     return this.http
       .post<ApiResponse<string | { id: string }>>(url, body, { headers: this.buildHeaders() })
@@ -182,6 +176,23 @@ export class HttpAssembliesRepository implements AssembliesRepository {
           }
 
           return identifier;
+        }),
+      );
+  }
+
+  private updateAssembly(payload: AssemblyDetail): Observable<void> {
+    const url = `${this.apiBaseUrl}/assemblies/${payload.id}`;
+    const body = this.buildAssemblyRequestBody(payload);
+
+    return this.http
+      .put<ApiResponse<unknown>>(url, body, { headers: this.buildHeaders() })
+      .pipe(map((response) => this.normalizeApiResponse(response)))
+      .pipe(
+        map((normalized) => {
+          if (!normalized.success) {
+            const message = normalized.message ?? normalized.errors?.[0] ?? 'No fue posible actualizar la asamblea.';
+            throw new Error(message);
+          }
         }),
       );
   }
@@ -214,6 +225,16 @@ export class HttpAssembliesRepository implements AssembliesRepository {
           }
         }),
       );
+  }
+
+  private buildAssemblyRequestBody(payload: AssemblyDetail): CreateAssemblyDto {
+    return {
+      title: payload.title,
+      description: payload.description || undefined,
+      rules: payload.rules || undefined,
+      startDatePlanned: payload.startAt,
+      endDatePlanned: payload.endAt,
+    } satisfies CreateAssemblyDto;
   }
 
   private mapDtoToSummary(dto: AssemblyDto): AssemblySummary {
