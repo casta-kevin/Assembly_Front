@@ -62,7 +62,7 @@ export class AgendaManagerComponent {
       startAt: [''],
       endAt: [''],
       allowsTieBreaker: [true],
-      status: ['programada'],
+      status: ['PLND'],
     });
   }
 

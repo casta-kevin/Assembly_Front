@@ -92,10 +92,10 @@
 
             <ul class="question-list">
               @for (entry of item.questions; track entry.question.id) {
-                <li class="question-row" [class.question-row--active]="entry.state?.status === 'activa'">
+                <li class="question-row" [class.question-row--active]="entry.state?.status === 'INPR'">
                   <div class="question-row__info">
                     <h4>{{ entry.question.text }}</h4>
-                    <p class="helper">Estado: {{ questionStatusLabel(entry.state?.status || entry.question.status || 'programada') }}</p>
+                    <p class="helper">Estado: {{ questionStatusLabel(entry.state?.status || entry.question.status || 'PLND') }}</p>
                     @if (entry.state?.votingWindowStart) {
                       <p class="helper">Inicio: {{ entry.state?.votingWindowStart | date: 'short' }}</p>
                     }
@@ -121,7 +121,7 @@
                     <button
                       type="button"
                       class="btn btn-ghost"
-                      [disabled]="entry.state?.status === 'activa'"
+                      [disabled]="entry.state?.status === 'INPR'"
                       (click)="openQuestion(entry.question.id)"
                     >
                       Abrir
@@ -129,7 +129,7 @@
                     <button
                       type="button"
                       class="btn btn-ghost"
-                      [disabled]="entry.state?.status !== 'activa'"
+                      [disabled]="entry.state?.status !== 'INPR'"
                       (click)="closeQuestion(entry.question.id)"
                     >
                       Cerrar

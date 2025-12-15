@@ -56,11 +56,14 @@
               <div class="participant-item__info">
                 <h3>{{ participant.name }}</h3>
                 <p class="helper">{{ participant.unit }}</p>
-                <span class="badge" [class]="participant.status === 'confirmado' ? 'badge--success' : participant.status === 'pendiente' ? 'badge--ghost' : 'badge--warning'">
-                  {{ participant.status | titlecase }}
+                <span class="badge" [class]="participantStatusBadge(participant.membershipStatus)">
+                  {{ participantStatusLabel(participant.membershipStatus) }}
                 </span>
                 @if (participant.joinedAt) {
                   <p class="helper">Registrado {{ participant.joinedAt | date: 'medium' }}</p>
+                }
+                @if (participant.confirmedAt) {
+                  <p class="helper">Confirmado {{ participant.confirmedAt | date: 'medium' }}</p>
                 }
               </div>
               <div class="participant-item__controls">
@@ -82,10 +85,10 @@
                 </label>
                 <div class="form-field">
                   <label>Estado</label>
-                  <select class="form-control" [value]="participant.status" (change)="updateStatus(participant.id, $any($event.target).value)">
-                    <option value="pendiente">Pendiente</option>
-                    <option value="confirmado">Confirmado</option>
-                    <option value="bloqueado">Bloqueado</option>
+                  <select class="form-control" [value]="participant.membershipStatus" (change)="updateStatus(participant.id, $any($event.target).value)">
+                    <option value="INVITED">Invitado</option>
+                    <option value="CONFIRMED">Confirmado</option>
+                    <option value="BLOCKED">Bloqueado</option>
                   </select>
                 </div>
               </div>

@@ -40,11 +40,9 @@ export class AssemblyFormComponent {
   protected readonly baseline = signal<AssemblyDetail | null>(null);
 
   protected readonly statusOptions: Array<{ label: string; value: AssemblyStatus }> = [
-    { label: 'Borrador', value: 'borrador' },
-    { label: 'Programada', value: 'programada' },
-    { label: 'En curso', value: 'en-curso' },
-    { label: 'Finalizada', value: 'finalizada' },
-    { label: 'Cerrada', value: 'cerrada' },
+    { label: 'Borrador', value: 'DRFT' },
+    { label: 'En progreso', value: 'INPR' },
+    { label: 'Finalizada', value: 'FNLC' },
   ];
 
   protected readonly availableInitiators = [
@@ -72,7 +70,7 @@ export class AssemblyFormComponent {
     rules: ['', [Validators.required, Validators.maxLength(1000)]],
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
-    status: this.fb.nonNullable.control<AssemblyStatus>('borrador', Validators.required),
+    status: this.fb.nonNullable.control<AssemblyStatus>('DRFT', Validators.required),
     canManageInitiators: [true],
     initiatorIds: this.fb.nonNullable.array<string>([]) as FormArray<FormControl<string>>,
     agenda: this.fb.nonNullable.array<FormGroup>([]) as FormArray<FormGroup>,
@@ -257,7 +255,7 @@ export class AssemblyFormComponent {
       startAt: [question?.startAt ?? ''],
       endAt: [question?.endAt ?? ''],
       allowsTieBreaker: [question?.allowsTieBreaker ?? true],
-      status: [question?.status ?? 'programada'],
+      status: [question?.status ?? 'PLND'],
     });
   }
 
@@ -348,7 +346,7 @@ export class AssemblyFormComponent {
             allowsTieBreaker: true,
             startAt: inHours(48.25),
             endAt: inHours(48.5),
-            status: 'programada',
+            status: 'PLND',
           },
         ],
       },
@@ -361,7 +359,7 @@ export class AssemblyFormComponent {
       rules: '',
       startAt: inHours(48),
       endAt: inHours(52),
-      status: 'borrador',
+      status: 'DRFT',
       agenda,
       canManageInitiators: true,
       initiatorIds: ['admin-01'],
@@ -391,7 +389,7 @@ export class AssemblyFormComponent {
       currentQuestionId: firstQuestion?.id,
       questionStates: agenda.flatMap((topic) => topic.questions.map((question) => ({
         questionId: question.id,
-        status: 'programada',
+        status: 'PLND',
         votingWindowStart: question.startAt,
         votingWindowEnd: question.endAt,
         yes: 0,

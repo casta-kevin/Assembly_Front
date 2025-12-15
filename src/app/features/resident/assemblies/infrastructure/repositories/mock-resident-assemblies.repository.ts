@@ -124,8 +124,8 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
     const normalized = this.normalizeSession(session);
     this.liveSessions.set(assemblyId, normalized);
 
-    if (normalized.status !== 'activa') {
-      throw new Error(normalized.status === 'cerrada'
+    if (normalized.status !== 'INPR') {
+      throw new Error(normalized.status === 'CLSD'
         ? 'La pregunta ya fue cerrada.'
         : 'La pregunta aún no está activa.');
     }
@@ -139,7 +139,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
     }
 
     if (normalized.closesAt && new Date(normalized.closesAt).getTime() < Date.now()) {
-      normalized.status = 'cerrada';
+      normalized.status = 'CLSD';
       normalized.allowVoting = false;
       this.liveSessions.set(assemblyId, normalized);
       throw new Error('La pregunta ya fue cerrada.');
@@ -181,7 +181,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         title: 'Nueva asamblea programada',
         summary: 'Fuiste asignado a la Asamblea Ordinaria Q1 2026. Revisa la agenda y prepárate.',
         startAt: iso(daysFromNow(7)),
-        status: 'programada',
+        status: 'DRFT',
         createdAt: iso(daysFromNow(-1)),
         read: false,
       },
@@ -192,7 +192,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         title: 'Asamblea en curso',
         summary: 'La Asamblea Extraordinaria de Seguridad está en curso. Puedes ingresar a seguir el progreso.',
         startAt: iso(daysFromNow(-1)),
-        status: 'en-curso',
+        status: 'INPR',
         createdAt: iso(daysFromNow(-0.2)),
         read: false,
       },
@@ -203,7 +203,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         title: 'Acta disponible',
         summary: 'Consulta el resumen de decisiones de la Asamblea Ordinaria 2025.',
         startAt: iso(daysFromNow(-90)),
-        status: 'finalizada',
+        status: 'FNLC',
         createdAt: iso(daysFromNow(-70)),
         read: true,
       },
@@ -226,7 +226,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         description: 'Resultados trimestrales, presupuestos y definiciones estratégicas.',
         startAt: iso(daysFromNow(7)),
         endAt: iso(daysFromNow(7.5)),
-        status: 'programada',
+        status: 'DRFT',
       },
       {
         id: 'asm-002',
@@ -234,7 +234,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         description: 'Revisión de plan de seguridad y contratación de proveedores.',
         startAt: iso(daysFromNow(-1)),
         endAt: iso(daysFromNow(0)),
-        status: 'en-curso',
+        status: 'INPR',
       },
       {
         id: 'asm-003',
@@ -242,7 +242,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         description: 'Cierre anual y plan de inversiones para 2026.',
         startAt: iso(daysFromNow(-90)),
         endAt: iso(daysFromNow(-89)),
-        status: 'finalizada',
+        status: 'FNLC',
       },
     ];
 
@@ -257,7 +257,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
       questionId: 'q-current-002',
       questionText: 'Aprobación del informe financiero',
       questionDescription: 'Confirma el informe financiero presentado por la administración.',
-      status: 'activa',
+      status: 'INPR',
       closesAt: this.shiftIso(0.05),
       allowVoting: true,
       results: {
@@ -279,7 +279,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         description: 'Discusión de resultados trimestrales, presupuesto y proyectos clave.',
         startAt: this.shiftIso(7),
         endAt: this.shiftIso(7.5),
-        status: 'programada',
+        status: 'DRFT',
         topics: this.createTopics('upcoming'),
       },
       {
@@ -288,7 +288,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         description: 'Plan de seguridad, presupuesto y proveedores para zonas comunes.',
         startAt: this.shiftIso(-1),
         endAt: this.shiftIso(0),
-        status: 'en-curso',
+        status: 'INPR',
         topics: this.createTopics('current'),
       },
       {
@@ -297,7 +297,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
         description: 'Cierre del año, aprobación de actas y plan de inversiones 2026.',
         startAt: this.shiftIso(-90),
         endAt: this.shiftIso(-89),
-        status: 'finalizada',
+        status: 'FNLC',
         topics: this.createTopics('past'),
       },
     ];
@@ -355,7 +355,7 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
 
   private normalizeSession(record: LiveQuestionRecord): LiveQuestionRecord {
     if (record.closesAt && new Date(record.closesAt).getTime() <= Date.now()) {
-      record.status = 'cerrada';
+      record.status = 'CLSD';
       record.allowVoting = false;
     }
 
@@ -366,15 +366,15 @@ export class MockResidentAssembliesRepository implements ResidentAssembliesRepos
     const userVote = record.userVotes.get(residentId);
     const now = Date.now();
     const isClosedByTime = record.closesAt ? new Date(record.closesAt).getTime() <= now : false;
-    const status = isClosedByTime ? 'cerrada' : record.status;
-    const canVote = status === 'activa' && record.allowVoting && !userVote && !isClosedByTime;
+    const status = isClosedByTime ? 'CLSD' : record.status;
+    const canVote = status === 'INPR' && record.allowVoting && !userVote && !isClosedByTime;
 
     let blockedReason: string | undefined;
     if (userVote) {
       blockedReason = 'Ya registraste tu voto en esta pregunta.';
-    } else if (status === 'programada') {
+    } else if (status === 'PLND') {
       blockedReason = 'La pregunta aún no está activa.';
-    } else if (status === 'cerrada' || isClosedByTime) {
+    } else if (status === 'CLSD' || isClosedByTime) {
       blockedReason = 'La pregunta ya fue cerrada.';
     } else if (!record.allowVoting) {
       blockedReason = 'No tienes permisos para votar en esta pregunta.';

@@ -15,12 +15,13 @@
 
 .live-vote__header h1 {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: var(--text-xl);
+  color: var(--foreground);
 }
 
 .live-vote__header .helper {
   margin: var(--space-2xs) 0 0;
-  color: var(--color-text-soft);
+  color: var(--muted-foreground);
 }
 
 .live-vote__actions {
@@ -39,8 +40,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
 .live-vote__question time {
@@ -51,24 +52,25 @@
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
 .live-vote h2 {
   margin: 0;
-  font-size: var(--font-size-lg);
+  font-size: var(--text-lg);
+  color: var(--foreground);
 }
 
 .live-vote__state {
   margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
 .live-vote__state--warning {
-  color: var(--color-danger);
-  font-weight: 600;
+  color: var(--destructive);
+  font-weight: var(--font-weight-medium);
 }
 
 .live-vote__buttons {
@@ -85,23 +87,24 @@
 }
 
 .live-vote__results div {
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
   padding: var(--space-sm);
-  background: var(--color-surface-muted);
+  background: var(--muted);
   text-align: center;
 }
 
 .live-vote__results dt {
   margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
 .live-vote__results dd {
   margin: var(--space-2xs) 0 0;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
 }
 
 .live-vote__empty {
@@ -111,7 +114,8 @@
 
 .live-vote__empty h2 {
   margin: 0 0 var(--space-xs);
-  font-size: var(--font-size-lg);
+  font-size: var(--text-lg);
+  color: var(--foreground);
 }
 
 .live-vote__loading {

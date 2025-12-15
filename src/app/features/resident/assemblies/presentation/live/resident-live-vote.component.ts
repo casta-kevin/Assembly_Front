@@ -8,6 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GetResidentLiveQuestionUseCase } from '../../../assemblies/application/use-cases/get-resident-live-question.use-case';
 import { SubmitResidentVoteUseCase } from '../../../assemblies/application/use-cases/submit-resident-vote.use-case';
 import { ResidentLiveQuestion, ResidentVoteChoice } from '../../../assemblies/domain/entities/resident-assembly';
+import { questionStatusLabel } from '../../../../admin/assemblies/domain/entities/assembly-status.utils';
 
 @Component({
   selector: 'app-resident-live-vote',
@@ -33,6 +34,7 @@ export class ResidentLiveVoteComponent {
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly successMessage = signal<string | null>(null);
+  protected readonly statusLabel = questionStatusLabel;
 
   protected readonly canVote = computed(() => {
     const current = this.question();
@@ -46,7 +48,7 @@ export class ResidentLiveVoteComponent {
       return 'En este momento no hay una pregunta activa. Vuelve a intentarlo más tarde.';
     }
 
-    if (current.status === 'cerrada') {
+    if (current.status === 'CLSD') {
       return 'La pregunta fue cerrada. El voto ya no está disponible.';
     }
 

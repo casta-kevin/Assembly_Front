@@ -1,37 +1,139 @@
+/* DomoNow Design System - Updated 2025-12-01 */
+
 :root {
-  color-scheme: light;
-  --color-background: #0f172a;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f8fafc;
-  --color-surface-strong: #1e293b;
-  --color-border: rgba(148, 163, 184, 0.25);
-  --color-primary-50: #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-200: #c7d2fe;
-  --color-primary-300: #a5b4fc;
-  --color-primary-400: #818cf8;
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
-  --color-primary-800: #3730a3;
-  --color-primary-900: #312e81;
-  --color-danger: #ef4444;
-  --color-success: #22c55e;
-  --color-info: #0ea5e9;
-  --color-text-strong: #0f172a;
-  --color-text-muted: #475569;
-  --color-text-soft: #94a3b8;
-  --color-overlay: rgba(15, 23, 42, 0.65);
-  --gradient-page: radial-gradient(circle at top left, rgba(99, 102, 241, 0.4), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.35), transparent 50%),
-    linear-gradient(135deg, #0f172a 0%, #312e81 100%);
-  --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 15px 30px -15px rgba(15, 23, 42, 0.55);
-  --shadow-lg: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
-  --radius-sm: 0.5rem;
-  --radius-md: 1.25rem;
-  --radius-lg: 1.75rem;
+  --font-size: 16px;
+  --font-weight-medium: 600;
+  --font-weight-normal: 400;
+
+  /* Typography scale */
+  --text-xs: 10px;
+  --text-sm: 12px;
+  --text-base: 16px;
+  --text-lg: 24px;
+  --text-xl: 32px;
+  --text-2xl: 48px;
+
+  /* Core colors */
+  --background: rgba(255, 255, 255, 1);
+  --foreground: rgba(27, 55, 72, 1);
+  --card: rgba(255, 255, 255, 1);
+  --card-foreground: rgba(27, 55, 72, 1);
+  --popover: rgba(0, 0, 0, 0.8);
+  --popover-foreground: rgba(255, 255, 255, 1);
+  --primary: rgba(27, 55, 72, 1);
+  --primary-foreground: rgba(255, 255, 255, 1);
+  --secondary: rgba(229, 237, 243, 1);
+  --secondary-foreground: rgba(27, 55, 72, 1);
+  --muted: rgba(229, 237, 243, 1);
+  --muted-foreground: rgba(110, 136, 158, 1);
+  --accent: rgba(255, 190, 0, 1);
+  --accent-foreground: rgba(0, 0, 0, 1);
+  --destructive: rgba(229, 57, 53, 1);
+  --destructive-foreground: rgba(255, 255, 255, 1);
+  --border: rgba(204, 204, 204, 1);
+  --input: rgba(255, 255, 255, 1);
+  --input-background: rgba(255, 255, 255, 1);
+  --ring: rgba(27, 55, 72, 1);
+
+  /* Semantic colors */
+  --success: rgba(46, 125, 50, 1);
+  --success-foreground: rgba(255, 255, 255, 1);
+  --warning: rgba(255, 190, 0, 1);
+  --warning-foreground: rgba(0, 0, 0, 1);
+  --info: rgba(49, 158, 216, 1);
+  --info-foreground: rgba(255, 255, 255, 1);
+  --purple: rgba(142, 68, 173, 1);
+  --purple-foreground: rgba(255, 255, 255, 1);
+  --purple-light: rgba(232, 218, 239, 1);
+
+  /* Chart colors */
+  --chart-1: rgba(0, 98, 255, 1);
+  --chart-2: rgba(27, 55, 72, 1);
+  --chart-3: rgba(255, 190, 0, 1);
+  --chart-4: rgba(46, 125, 50, 1);
+  --chart-5: rgba(229, 57, 53, 1);
+
+  /* Sidebar */
+  --sidebar: rgba(27, 55, 72, 1);
+  --sidebar-foreground: rgba(255, 255, 255, 1);
+  --sidebar-primary: rgba(255, 190, 0, 1);
+  --sidebar-primary-foreground: rgba(0, 0, 0, 1);
+  --sidebar-accent: rgba(49, 158, 216, 1);
+  --sidebar-accent-foreground: rgba(255, 255, 255, 1);
+  --sidebar-border: rgba(110, 136, 158, 1);
+  --sidebar-ring: rgba(255, 190, 0, 1);
+
+  /* Elevation */
+  --elevation-sm: 0px 2px 4px 0px rgba(27, 55, 72, 0.08), 0px 0px 2px 0px rgba(27, 55, 72, 0.08);
+
+  /* Border radius */
+  --radius: 12px;
+  --radius-button: 12px;
+  --radius-card: 16px;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Mapped tokens for component compatibility */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-purple: var(--purple);
+  --color-purple-foreground: var(--purple-foreground);
+  --color-purple-light: var(--purple-light);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --shadow-elevation-sm: var(--elevation-sm);
+
+  /* Legacy mapped tokens */
+  --color-surface: var(--card);
+  --color-surface-muted: var(--muted);
+  --color-text-strong: var(--foreground);
+  --color-text-muted: var(--muted-foreground);
+  --color-text-soft: rgba(150, 170, 188, 1);
+  --color-danger: var(--destructive);
+  --color-danger-foreground: var(--destructive-foreground);
+  --color-primary-600: var(--primary);
+  --color-primary-500: rgba(49, 79, 105, 1);
+  --color-primary-400: rgba(75, 105, 130, 1);
+  --color-overlay: rgba(27, 55, 72, 0.25);
+  --gradient-page: linear-gradient(180deg, rgba(245, 250, 255, 1) 0%, var(--muted) 50%, var(--background) 100%);
+  --shadow-sm: var(--elevation-sm);
+  --shadow-md: 0px 8px 24px rgba(27, 55, 72, 0.12);
+  --shadow-lg: 0px 24px 48px rgba(27, 55, 72, 0.16);
   --border-width: 1px;
+
+  /* Spacing */
   --space-3xs: 0.25rem;
   --space-2xs: 0.5rem;
   --space-xs: 0.75rem;
@@ -39,27 +141,88 @@
   --space-md: 1.5rem;
   --space-lg: 2rem;
   --space-xl: 3rem;
-  --font-family-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
+
+  /* Font sizes (rem) */
+  --font-size-xs: 0.625rem;
+  --font-size-sm: 0.75rem;
   --font-size-md: 1rem;
-  --font-size-lg: 1.25rem;
-  --font-size-xl: 1.75rem;
-  --transition-base: 160ms ease;
+  --font-size-lg: 1.5rem;
+  --font-size-xl: 2rem;
+
+  --font-family-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition-base: 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dark {
+  --background: rgba(16, 23, 28, 1);
+  --foreground: rgba(229, 237, 243, 1);
+  --card: rgba(27, 35, 40, 1);
+  --card-foreground: rgba(229, 237, 243, 1);
+  --popover: rgba(0, 0, 0, 0.9);
+  --popover-foreground: rgba(255, 255, 255, 1);
+  --primary: rgba(49, 158, 216, 1);
+  --primary-foreground: rgba(255, 255, 255, 1);
+  --secondary: rgba(50, 65, 75, 1);
+  --secondary-foreground: rgba(229, 237, 243, 1);
+  --muted: rgba(50, 65, 75, 1);
+  --muted-foreground: rgba(110, 136, 158, 1);
+  --accent: rgba(255, 190, 0, 1);
+  --accent-foreground: rgba(0, 0, 0, 1);
+  --destructive: rgba(229, 57, 53, 1);
+  --destructive-foreground: rgba(255, 255, 255, 1);
+  --border: rgba(75, 90, 100, 1);
+  --input: rgba(27, 35, 40, 1);
+  --input-background: rgba(27, 35, 40, 1);
+  --ring: rgba(49, 158, 216, 1);
+  --elevation-sm: 0px 2px 4px 0px rgba(0, 0, 0, 0.25), 0px 0px 2px 0px rgba(0, 0, 0, 0.15);
+  --purple-light: rgba(232, 218, 239, 0.15);
+  --sidebar: rgba(16, 23, 28, 1);
+  --sidebar-foreground: rgba(229, 237, 243, 1);
+  --sidebar-border: rgba(75, 90, 100, 1);
+  --color-text-strong: var(--foreground);
+  --color-text-muted: var(--muted-foreground);
+  --color-surface: var(--card);
+  --color-surface-muted: var(--muted);
+  --color-primary-600: var(--primary);
+  --color-primary-500: rgba(80, 170, 220, 1);
+  --color-primary-400: rgba(110, 185, 230, 1);
+  --gradient-page: linear-gradient(180deg, rgba(22, 30, 38, 1) 0%, var(--background) 100%);
+  --shadow-md: 0px 8px 24px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0px 24px 48px rgba(0, 0, 0, 0.32);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --color-background: #020617;
-    --color-surface: #0f172a;
-    --color-surface-muted: #111c34;
-    --color-border: rgba(15, 23, 42, 0.65);
-    --color-text-strong: #f8fafc;
-    --color-text-muted: #cbd5f5;
-    --color-text-soft: #94a3b8;
-    --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.75), 0 2px 4px -2px rgba(15, 23, 42, 0.65);
-    --shadow-md: 0 15px 30px -15px rgba(15, 23, 42, 0.75);
-    --shadow-lg: 0 25px 50px -12px rgba(15, 23, 42, 0.7);
+  :root:not(.light) {
+    --background: rgba(16, 23, 28, 1);
+    --foreground: rgba(229, 237, 243, 1);
+    --card: rgba(27, 35, 40, 1);
+    --card-foreground: rgba(229, 237, 243, 1);
+    --popover: rgba(0, 0, 0, 0.9);
+    --popover-foreground: rgba(255, 255, 255, 1);
+    --primary: rgba(49, 158, 216, 1);
+    --primary-foreground: rgba(255, 255, 255, 1);
+    --secondary: rgba(50, 65, 75, 1);
+    --secondary-foreground: rgba(229, 237, 243, 1);
+    --muted: rgba(50, 65, 75, 1);
+    --muted-foreground: rgba(110, 136, 158, 1);
+    --border: rgba(75, 90, 100, 1);
+    --input: rgba(27, 35, 40, 1);
+    --input-background: rgba(27, 35, 40, 1);
+    --ring: rgba(49, 158, 216, 1);
+    --elevation-sm: 0px 2px 4px 0px rgba(0, 0, 0, 0.25), 0px 0px 2px 0px rgba(0, 0, 0, 0.15);
+    --purple-light: rgba(232, 218, 239, 0.15);
+    --sidebar: rgba(16, 23, 28, 1);
+    --sidebar-foreground: rgba(229, 237, 243, 1);
+    --sidebar-border: rgba(75, 90, 100, 1);
+    --color-text-strong: var(--foreground);
+    --color-text-muted: var(--muted-foreground);
+    --color-surface: var(--card);
+    --color-surface-muted: var(--muted);
+    --color-primary-600: var(--primary);
+    --color-primary-500: rgba(80, 170, 220, 1);
+    --color-primary-400: rgba(110, 185, 230, 1);
+    --gradient-page: linear-gradient(180deg, rgba(22, 30, 38, 1) 0%, var(--background) 100%);
+    --shadow-md: 0px 8px 24px rgba(0, 0, 0, 0.28);
+    --shadow-lg: 0px 24px 48px rgba(0, 0, 0, 0.32);
   }
 }

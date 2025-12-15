@@ -7,6 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GetAssemblyUseCase } from '../../../assemblies/application/use-cases/get-assembly.use-case';
 import { SaveAssemblyUseCase } from '../../../assemblies/application/use-cases/save-assembly.use-case';
 import { AssemblyDetail, AssemblyParticipant, AssemblyResidentCandidate } from '../../../assemblies/domain/entities/assembly';
+import { participantStatusBadge, participantStatusLabel } from '../../../assemblies/domain/entities/assembly-status.utils';
 
 @Component({
   selector: 'app-assembly-participants',
@@ -32,13 +33,15 @@ export class AssemblyParticipantsComponent {
   protected readonly assembly = signal<AssemblyDetail | null>(null);
   protected readonly participants = signal<AssemblyParticipant[]>([]);
   protected readonly availableCandidates = signal<AssemblyResidentCandidate[]>([]);
+  protected readonly participantStatusLabel = participantStatusLabel;
+  protected readonly participantStatusBadge = participantStatusBadge;
 
   protected readonly filterControl: FormControl<string> = this.fb.nonNullable.control('');
   private readonly filterTerm = signal('');
 
   protected readonly isLocked = computed(() => {
     const status = this.assembly()?.status;
-    return status !== 'borrador' && status !== 'programada';
+    return status !== 'DRFT';
   });
 
   protected readonly summary = computed(() => {
@@ -46,7 +49,7 @@ export class AssemblyParticipantsComponent {
     return {
       total: list.length,
       startVoters: list.filter((item) => item.canVoteStart).length,
-      blocked: list.filter((item) => item.status === 'bloqueado').length,
+      blocked: list.filter((item) => item.membershipStatus === 'BLOCKED').length,
     };
   });
 
@@ -91,10 +94,10 @@ export class AssemblyParticipantsComponent {
     )));
   }
 
-  protected updateStatus(id: string, status: AssemblyParticipant['status']): void {
+  protected updateStatus(id: string, status: AssemblyParticipant['membershipStatus']): void {
     this.participants.update((current) => current.map((participant) => (
       participant.id === id
-        ? { ...participant, status }
+        ? { ...participant, membershipStatus: status }
         : participant
     )));
   }
@@ -122,7 +125,7 @@ export class AssemblyParticipantsComponent {
         ...candidate,
         canVoteStart: false,
         canVoteQuestions: true,
-        status: 'pendiente',
+        membershipStatus: 'INVITED',
         joinedAt: undefined,
       },
     ]);

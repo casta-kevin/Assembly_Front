@@ -35,9 +35,9 @@ export class TopicQuestionsComponent {
   protected readonly topicsList = computed(() => this.assembly()?.agenda ?? []);
 
   protected readonly statusOptions: Array<{ value: QuestionStatus; label: string }> = [
-    { value: 'programada', label: 'Programada' },
-    { value: 'activa', label: 'Activa' },
-    { value: 'cerrada', label: 'Cerrada' },
+    { value: 'PLND', label: 'Planificada' },
+    { value: 'INPR', label: 'En progreso' },
+    { value: 'CLSD', label: 'Cerrada' },
   ];
 
   protected readonly form = this.fb.nonNullable.group({
@@ -218,7 +218,7 @@ export class TopicQuestionsComponent {
       description: [question?.description ?? '', Validators.maxLength(400)],
       startAt: [question?.startAt ? question.startAt.slice(0, 16) : ''],
       endAt: [question?.endAt ? question.endAt.slice(0, 16) : ''],
-      status: [question?.status ?? 'programada'],
+      status: [question?.status ?? 'PLND'],
       allowsTieBreaker: [question?.allowsTieBreaker ?? true],
     });
   }

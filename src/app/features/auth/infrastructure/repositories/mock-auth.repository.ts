@@ -21,6 +21,8 @@ export class MockAuthRepository implements AuthRepository {
         avatarUrl: this.buildAvatar(email),
       },
       token: this.generateToken(email, timestamp),
+      propertyId: 'mock-property-id',
+      roleId: email.includes('admin') ? 'admin' : 'resident',
       refreshToken: credentials.rememberMe ? this.generateToken(email, timestamp + 1) : undefined,
       expiresAt: new Date(timestamp + 1000 * 60 * 45),
     };

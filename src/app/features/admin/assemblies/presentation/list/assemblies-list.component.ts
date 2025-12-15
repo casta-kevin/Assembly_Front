@@ -8,6 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { LoadAssembliesUseCase } from '../../../assemblies/application/use-cases/load-assemblies.use-case';
 import { AssemblyFilters, AssemblySummary } from '../../../assemblies/domain/entities/assembly';
+import { assemblyStatusBadge, assemblyStatusLabel } from '../../../assemblies/domain/entities/assembly-status.utils';
 
 @Component({
   selector: 'app-assemblies-list',
@@ -25,7 +26,7 @@ export class AssembliesListComponent {
 
   protected readonly filterForm = this.fb.nonNullable.group({
     search: [''],
-    status: ['todas' as AssemblyFilters['status']],
+    status: ['ALL' as AssemblyFilters['status']],
     range: this.fb.nonNullable.group({
       start: [''],
       end: [''],
@@ -40,9 +41,9 @@ export class AssembliesListComponent {
     const list = this.assemblies();
     return {
       total: list.length,
-      upcoming: list.filter((item) => item.status === 'programada').length,
-      inProgress: list.filter((item) => item.status === 'en-curso').length,
-      finished: list.filter((item) => item.status === 'finalizada' || item.status === 'cerrada').length,
+      draft: list.filter((item) => item.status === 'DRFT').length,
+      inProgress: list.filter((item) => item.status === 'INPR').length,
+      finished: list.filter((item) => item.status === 'FNLC').length,
     };
   });
 
@@ -73,36 +74,17 @@ export class AssembliesListComponent {
   protected resetFilters(): void {
     this.filterForm.reset({
       search: '',
-      status: 'todas',
+      status: 'ALL',
       range: { start: '', end: '' },
     });
   }
 
   protected statusLabel(status: AssemblySummary['status']): string {
-    switch (status) {
-      case 'borrador':
-        return 'Borrador';
-      case 'programada':
-        return 'Programada';
-      case 'en-curso':
-        return 'En curso';
-      case 'finalizada':
-        return 'Finalizada';
-      case 'cerrada':
-        return 'Cerrada';
-      default:
-        return status;
-    }
+    return assemblyStatusLabel(status);
   }
 
   protected statusBadgeClass(status: AssemblySummary['status']): string {
-    return {
-      borrador: 'badge--draft',
-      programada: 'badge--scheduled',
-      'en-curso': 'badge--running',
-      finalizada: 'badge--finished',
-      cerrada: 'badge--closed',
-    }[status] ?? 'badge--draft';
+    return assemblyStatusBadge(status);
   }
 
   protected trackById(_: number, item: AssemblySummary): string {
@@ -120,7 +102,7 @@ export class AssembliesListComponent {
   private mapFilters(rawFilters: typeof this.filterForm.value): Partial<AssemblyFilters> {
     return {
       search: rawFilters.search ?? undefined,
-      status: rawFilters.status ?? 'todas',
+      status: rawFilters.status ?? 'ALL',
       range: {
         start: rawFilters.range?.start ?? undefined,
         end: rawFilters.range?.end ?? undefined,

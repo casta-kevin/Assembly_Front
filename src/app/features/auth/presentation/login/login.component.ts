@@ -6,6 +6,7 @@ import { finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { LoginUseCase } from '../../application/use-cases/login.use-case';
+import { AuthSessionService } from '../../application/services/auth-session.service';
 
 type LoginFormValue = {
   email: string;
@@ -26,6 +27,7 @@ export class LoginComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly loginUseCase = inject(LoginUseCase);
   private readonly router = inject(Router);
+  private readonly sessionService = inject(AuthSessionService);
 
   protected readonly loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required]],
@@ -68,8 +70,9 @@ export class LoginComponent {
       )
       .subscribe({
         next: (session) => {
+          this.sessionService.setSession(session, rememberMe);
           this.successMessage.set(`Hola ${session.user.name}, tu sesión está activa.`);
-          void this.router.navigate(['/admin', 'assemblies']);
+          void this.router.navigate(this.resolveLandingRoute(session.roleId));
         },
         error: (error: unknown) => {
           const message = error instanceof Error ? error.message : 'No fue posible iniciar sesión. Inténtalo de nuevo.';
@@ -81,5 +84,21 @@ export class LoginComponent {
   protected controlInvalid(controlName: keyof LoginFormValue): boolean {
     const control = this.loginForm.controls[controlName];
     return control.invalid && (control.dirty || control.touched);
+  }
+
+  private resolveLandingRoute(roleId: string | undefined): string[] {
+    const normalized = (roleId ?? '').trim().toUpperCase();
+    if (!normalized) {
+      return ['/'];
+    }
+
+    switch (true) {
+      case normalized === 'ADMN' || normalized.includes('ADMIN'):
+        return ['/admin', 'assemblies'];
+      case normalized === 'RSDT' || normalized.includes('RESIDENT') || normalized.includes('VECINO'):
+        return ['/resident', 'notifications'];
+      default:
+        return ['/'];
+    }
   }
 }

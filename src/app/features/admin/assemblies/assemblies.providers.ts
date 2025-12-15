@@ -4,11 +4,11 @@ import { LoadAssembliesUseCase } from './application/use-cases/load-assemblies.u
 import { GetAssemblyUseCase } from './application/use-cases/get-assembly.use-case';
 import { SaveAssemblyUseCase } from './application/use-cases/save-assembly.use-case';
 import { ASSEMBLIES_REPOSITORY } from './domain/repositories/assemblies.repository';
-import { MockAssembliesRepository } from './infrastructure/repositories/mock-assemblies.repository';
+import { HttpAssembliesRepository } from './infrastructure/repositories/http-assemblies.repository';
 
 export function provideAssembliesFeature(): Provider[] {
   return [
-    { provide: ASSEMBLIES_REPOSITORY, useClass: MockAssembliesRepository },
+    { provide: ASSEMBLIES_REPOSITORY, useClass: HttpAssembliesRepository },
     LoadAssembliesUseCase,
     GetAssemblyUseCase,
     SaveAssemblyUseCase,

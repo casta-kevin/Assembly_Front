@@ -12,6 +12,7 @@ import {
   TopicQuestionResult,
   TopicQuestionVote,
 } from '../../../assemblies/domain/entities/assembly';
+import { assemblyStatusBadge, assemblyStatusLabel } from '../../../assemblies/domain/entities/assembly-status.utils';
 
 interface QuestionResultWithContext extends TopicQuestionResult {
   topic?: AgendaTopic;
@@ -36,6 +37,7 @@ export class AssemblyDetailComponent {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly assemblyId = signal<string>('');
   protected readonly assembly = signal<AssemblyDetail | null>(null);
+  protected readonly statusBadge = assemblyStatusBadge;
 
   protected readonly history = computed<AssemblyHistory>(() => this.assembly()?.history ?? { events: [], questionResults: [] });
 
@@ -84,20 +86,7 @@ export class AssemblyDetailComponent {
   }
 
   protected statusLabel(status: AssemblyDetail['status']): string {
-    switch (status) {
-      case 'borrador':
-        return 'Borrador';
-      case 'programada':
-        return 'Programada';
-      case 'en-curso':
-        return 'En curso';
-      case 'finalizada':
-        return 'Finalizada';
-      case 'cerrada':
-        return 'Cerrada';
-      default:
-        return status;
-    }
+    return assemblyStatusLabel(status);
   }
 
   protected choiceLabel(choice: TopicQuestionVote['choice']): string {

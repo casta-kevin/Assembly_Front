@@ -15,8 +15,8 @@
       <strong>{{ stats().total }}</strong>
     </article>
     <article class="stat-card">
-      <span>Programadas</span>
-      <strong>{{ stats().upcoming }}</strong>
+      <span>Borradores</span>
+      <strong>{{ stats().draft }}</strong>
     </article>
     <article class="stat-card">
       <span>En curso</span>
@@ -43,12 +43,10 @@
     <div class="filter">
       <label for="filter-status">Estado</label>
       <select id="filter-status" formControlName="status" class="form-control">
-        <option value="todas">Todas</option>
-        <option value="borrador">Borrador</option>
-        <option value="programada">Programada</option>
-        <option value="en-curso">En curso</option>
-        <option value="finalizada">Finalizada</option>
-        <option value="cerrada">Cerrada</option>
+        <option value="ALL">Todos</option>
+        <option value="DRFT">Borrador</option>
+        <option value="INPR">En progreso</option>
+        <option value="FNLC">Finalizada</option>
       </select>
     </div>
 

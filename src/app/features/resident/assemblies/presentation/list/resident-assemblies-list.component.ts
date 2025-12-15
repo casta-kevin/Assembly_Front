@@ -12,6 +12,7 @@ import {
   ResidentAssemblyFilters,
   ResidentAssemblySummary,
 } from '../../../assemblies/domain/entities/resident-assembly';
+import { assemblyStatusBadge, assemblyStatusLabel } from '../../../../admin/assemblies/domain/entities/assembly-status.utils';
 
 @Component({
   selector: 'app-resident-assemblies-list',
@@ -38,13 +39,8 @@ export class ResidentAssembliesListComponent {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly assignments = signal<ResidentAssemblySummary[]>([]);
   private readonly currentFilters = signal<ResidentAssemblyFilters>({ status: 'todas', search: '' });
-  private readonly badgeClassMap: Record<ResidentAssemblySummary['status'], string> = {
-    borrador: 'badge--draft',
-    programada: 'badge--scheduled',
-    'en-curso': 'badge--running',
-    finalizada: 'badge--finished',
-    cerrada: 'badge--closed',
-  };
+  protected readonly statusLabel = assemblyStatusLabel;
+  protected readonly badgeClass = assemblyStatusBadge;
 
   protected readonly filteredAssignments = computed(() => {
     const list = this.assignments();
@@ -54,10 +50,10 @@ export class ResidentAssembliesListComponent {
       const matchesStatus = filters.status === 'todas'
         ? true
         : filters.status === 'proximas'
-          ? item.status === 'programada'
+          ? item.status === 'DRFT'
           : filters.status === 'en-curso'
-            ? item.status === 'en-curso'
-            : item.status === 'finalizada' || item.status === 'cerrada';
+            ? item.status === 'INPR'
+            : item.status === 'FNLC';
 
       const matchesSearch = filters.search
         ? item.title.toLowerCase().includes(filters.search)
@@ -72,9 +68,9 @@ export class ResidentAssembliesListComponent {
     const list = this.assignments();
     return {
       total: list.length,
-      upcoming: list.filter((item) => item.status === 'programada').length,
-      live: list.filter((item) => item.status === 'en-curso').length,
-      finished: list.filter((item) => item.status === 'finalizada' || item.status === 'cerrada').length,
+      upcoming: list.filter((item) => item.status === 'DRFT').length,
+      live: list.filter((item) => item.status === 'INPR').length,
+      finished: list.filter((item) => item.status === 'FNLC').length,
     };
   });
 
@@ -88,25 +84,6 @@ export class ResidentAssembliesListComponent {
       search: '',
       status: 'todas',
     });
-  }
-
-  protected statusLabel(status: ResidentAssemblySummary['status']): string {
-    switch (status) {
-      case 'programada':
-        return 'Programada';
-      case 'en-curso':
-        return 'En curso';
-      case 'finalizada':
-        return 'Finalizada';
-      case 'cerrada':
-        return 'Cerrada';
-      default:
-        return status;
-    }
-  }
-
-  protected badgeClass(status: ResidentAssemblySummary['status']): string {
-    return this.badgeClassMap[status] ?? this.badgeClassMap.programada;
   }
 
   protected trackById(_: number, item: ResidentAssemblySummary): string {

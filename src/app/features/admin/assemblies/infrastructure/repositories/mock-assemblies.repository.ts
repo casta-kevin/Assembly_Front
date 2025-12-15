@@ -76,7 +76,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
     }
 
     return data.filter((summary) => {
-      const matchesStatus = filters.status && filters.status !== 'todas'
+      const matchesStatus = filters.status && filters.status !== 'ALL'
         ? summary.status === filters.status
         : true;
 
@@ -120,7 +120,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
       status: detail.status,
       topics: detail.agenda.length,
       createdBy: detail.createdBy,
-      canEdit: detail.status === 'borrador' || detail.status === 'programada',
+      canEdit: detail.status === 'DRFT',
     } satisfies AssemblySummary;
   }
 
@@ -162,7 +162,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
         rules: 'Quorum mínimo del 60%. Decisiones por mayoría simple, salvo lo contrario indicado.',
         startAt: iso(inDays(7)),
         endAt: iso(inDays(7.5)),
-        status: 'programada',
+        status: 'DRFT',
         agenda: agendaUpcoming,
         canManageInitiators: true,
         initiatorIds: ['admin-01', 'admin-02'],
@@ -182,7 +182,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
         rules: 'Quorum mínimo del 70%. Empates resueltos por el administrador asignado.',
         startAt: iso(inDays(-1)),
         endAt: iso(inDays(0)),
-        status: 'en-curso',
+        status: 'INPR',
         agenda: agendaCurrent,
         canManageInitiators: false,
         initiatorIds: ['admin-02'],
@@ -202,7 +202,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
         rules: 'Mayoría simple. Empates resueltos por el administrador general.',
         startAt: iso(inDays(-90)),
         endAt: iso(inDays(-89)),
-        status: 'finalizada',
+        status: 'FNLC',
         agenda: agendaPast,
         canManageInitiators: false,
         initiatorIds: ['admin-01'],
@@ -242,18 +242,24 @@ export class MockAssembliesRepository implements AssembliesRepository {
 
     return subset.map((candidate, index) => {
       const isBlocked = mode !== 'upcoming' && index === subset.length - 1;
-      const status: AssemblyParticipant['status'] = mode === 'upcoming'
-        ? 'pendiente'
+      const membershipStatus: AssemblyParticipant['membershipStatus'] = mode === 'upcoming'
+        ? 'INVITED'
         : isBlocked
-          ? 'bloqueado'
-          : 'confirmado';
+          ? 'BLOCKED'
+          : 'CONFIRMED';
+
+      const joinedAt = mode === 'upcoming' ? undefined : this.addMinutes(baseIso, index * 12);
+      const confirmedAt = membershipStatus === 'CONFIRMED' ? joinedAt ?? this.addMinutes(baseIso, index * 12) : undefined;
 
       return {
         ...candidate,
         canVoteStart: index < 3,
-        canVoteQuestions: status !== 'bloqueado',
-        status,
-        joinedAt: mode === 'upcoming' ? undefined : this.addMinutes(baseIso, index * 12),
+        canVoteQuestions: membershipStatus !== 'BLOCKED',
+        membershipStatus,
+        joinedAt,
+        confirmationMethodId: membershipStatus === 'CONFIRMED' ? (index % 2 === 0 ? 'PRSC' : 'TKEN') : undefined,
+        confirmedByUserId: membershipStatus === 'CONFIRMED' ? 'admin-01' : undefined,
+        confirmedAt,
       } satisfies AssemblyParticipant;
     });
   }
@@ -279,7 +285,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
           const match = resultMap.get(question.id);
           return {
             questionId: question.id,
-            status: 'cerrada',
+            status: 'CLSD',
             votingWindowStart: question.startAt,
             votingWindowEnd: question.endAt,
             yes: match?.yes ?? 0,
@@ -305,14 +311,14 @@ export class MockAssembliesRepository implements AssembliesRepository {
         startedAt: agenda[0]?.startAt ?? new Date().toISOString(),
         questionStates: agenda.flatMap((topic, topicIndex) => topic.questions.map((question, questionIndex) => {
           const status: QuestionStatus = topicIndex === 0
-            ? 'cerrada'
+            ? 'CLSD'
             : topicIndex === 1 && questionIndex === 0
-              ? 'activa'
-              : 'programada';
+              ? 'INPR'
+              : 'PLND';
 
-          const yes = status === 'cerrada' ? 34 - questionIndex * 3 : status === 'activa' ? 20 : 0;
-          const no = status === 'cerrada' ? 18 + questionIndex * 2 : status === 'activa' ? 20 : 0;
-          const abstain = status === 'cerrada' ? 3 : status === 'activa' ? 2 : 0;
+          const yes = status === 'CLSD' ? 34 - questionIndex * 3 : status === 'INPR' ? 20 : 0;
+          const no = status === 'CLSD' ? 18 + questionIndex * 2 : status === 'INPR' ? 20 : 0;
+          const abstain = status === 'CLSD' ? 3 : status === 'INPR' ? 2 : 0;
 
           return {
             questionId: question.id,
@@ -323,7 +329,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
             no,
             abstain,
             allowsTieBreaker: question.allowsTieBreaker,
-            tieBreakerUsed: status === 'cerrada' ? question.allowsTieBreaker && yes > no : false,
+            tieBreakerUsed: status === 'CLSD' ? question.allowsTieBreaker && yes > no : false,
           };
         })),
       } satisfies AssemblyLiveState;
@@ -340,7 +346,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
       currentQuestionId: firstQuestion?.id,
       questionStates: agenda.flatMap((topic) => topic.questions.map((question) => ({
         questionId: question.id,
-        status: 'programada',
+        status: 'PLND',
         votingWindowStart: question.startAt,
         votingWindowEnd: question.endAt,
         yes: 0,
@@ -534,7 +540,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
             startAt: asISOString(0.2),
             endAt: asISOString(0.3),
             allowsTieBreaker: true,
-            status: mode === 'past' ? 'cerrada' : 'programada',
+            status: mode === 'past' ? 'CLSD' : 'PLND',
           },
         ],
       },
@@ -552,7 +558,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
             startAt: asISOString(1.2),
             endAt: asISOString(1.4),
             allowsTieBreaker: true,
-            status: mode === 'past' ? 'cerrada' : mode === 'current' ? 'activa' : 'programada',
+            status: mode === 'past' ? 'CLSD' : mode === 'current' ? 'INPR' : 'PLND',
           },
           {
             id: `${mode}-question-3`,
@@ -560,7 +566,7 @@ export class MockAssembliesRepository implements AssembliesRepository {
             startAt: asISOString(1.5),
             endAt: asISOString(1.7),
             allowsTieBreaker: false,
-            status: mode === 'past' ? 'cerrada' : 'programada',
+            status: mode === 'past' ? 'CLSD' : 'PLND',
           },
         ],
       },

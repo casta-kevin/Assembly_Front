@@ -1,3 +1,17 @@
-<main class="app-shell">
-  <router-outlet />
-</main>
+<div class="app-shell">
+  <header class="app-shell__header">
+    <h1 class="app-shell__brand">Assembly</h1>
+    <div class="app-shell__actions">
+      <app-theme-toggle />
+      <app-logout-button></app-logout-button>
+    </div>
+  </header>
+  <div class="app-shell__body">
+    <aside class="app-shell__sidebar">
+      <app-sidebar-navigation />
+    </aside>
+    <main class="app-shell__content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

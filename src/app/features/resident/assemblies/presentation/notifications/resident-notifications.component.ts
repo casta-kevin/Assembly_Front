@@ -8,6 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoadResidentNotificationsUseCase } from '../../../assemblies/application/use-cases/load-resident-notifications.use-case';
 import { MarkNotificationReadUseCase } from '../../../assemblies/application/use-cases/mark-notification-read.use-case';
 import { ResidentNotification } from '../../../assemblies/domain/entities/resident-assembly';
+import { assemblyStatusBadge, assemblyStatusLabel } from '../../../../admin/assemblies/domain/entities/assembly-status.utils';
 
 @Component({
   selector: 'app-resident-notifications',
@@ -24,13 +25,8 @@ export class ResidentNotificationsComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly residentId = 'res-001';
-  private readonly badgeClassMap: Record<ResidentNotification['status'], string> = {
-    borrador: 'badge--draft',
-    programada: 'badge--scheduled',
-    'en-curso': 'badge--running',
-    finalizada: 'badge--finished',
-    cerrada: 'badge--closed',
-  };
+  protected readonly statusLabel = assemblyStatusLabel;
+  protected readonly badgeClass = assemblyStatusBadge;
 
   protected readonly notifications = signal<ResidentNotification[]>([]);
   protected readonly isLoading = signal(false);
@@ -38,25 +34,6 @@ export class ResidentNotificationsComponent {
 
   constructor() {
     this.fetchNotifications();
-  }
-
-  protected statusLabel(status: ResidentNotification['status']): string {
-    switch (status) {
-      case 'programada':
-        return 'Programada';
-      case 'en-curso':
-        return 'En curso';
-      case 'finalizada':
-        return 'Finalizada';
-      case 'cerrada':
-        return 'Cerrada';
-      default:
-        return status;
-    }
-  }
-
-  protected badgeClass(status: ResidentNotification['status']): string {
-    return this.badgeClassMap[status] ?? this.badgeClassMap.programada;
   }
 
   protected trackById(_: number, item: ResidentNotification): string {

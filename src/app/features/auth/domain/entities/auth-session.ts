@@ -8,6 +8,8 @@ export interface AuthenticatedUser {
 export interface AuthSession {
   user: AuthenticatedUser;
   token: string;
+  propertyId: string;
+  roleId: string;
   refreshToken?: string;
-  expiresAt: Date;
+  expiresAt?: Date;
 }

@@ -13,6 +13,7 @@ import {
   QuestionStatus,
   TopicQuestion,
 } from '../../../assemblies/domain/entities/assembly';
+import { questionStatusLabel as mapQuestionStatusLabel } from '../../../assemblies/domain/entities/assembly-status.utils';
 
 @Component({
   selector: 'app-assembly-live-console',
@@ -37,6 +38,7 @@ export class AssemblyLiveConsoleComponent {
   protected readonly assembly = signal<AssemblyDetail | null>(null);
   protected readonly liveState = signal<AssemblyLiveState | null>(null);
   protected readonly agenda = signal<AgendaTopic[]>([]);
+  protected readonly questionStatusLabel = mapQuestionStatusLabel;
 
   protected readonly topicsWithState = computed(() => {
     const agenda = this.agenda();
@@ -127,13 +129,14 @@ export class AssemblyLiveConsoleComponent {
         question.questionId === questionId
           ? {
             ...question,
-            status: 'activa',
+            status: 'INPR',
             votingWindowStart: question.votingWindowStart ?? this.nowIso(),
             votingWindowEnd: undefined,
           }
           : question
       )),
     }));
+
   }
 
   protected closeQuestion(questionId: string): void {
@@ -143,7 +146,7 @@ export class AssemblyLiveConsoleComponent {
         question.questionId === questionId
           ? {
             ...question,
-            status: 'cerrada',
+            status: 'CLSD',
             votingWindowEnd: this.nowIso(),
           }
           : question
@@ -155,7 +158,7 @@ export class AssemblyLiveConsoleComponent {
     this.updateLiveState((state) => ({
       ...state,
       questionStates: state.questionStates.map((question) => {
-        if (question.questionId !== questionId) {
+        if (question.questionId !== questionId || question.status !== 'CLSD') {
           return question;
         }
 
@@ -215,24 +218,11 @@ export class AssemblyLiveConsoleComponent {
     void this.router.navigate(['/admin', 'assemblies', this.assemblyId()]);
   }
 
-  protected questionStatusLabel(status: QuestionStatus): string {
-    switch (status) {
-      case 'programada':
-        return 'Programada';
-      case 'activa':
-        return 'Activa';
-      case 'cerrada':
-        return 'Cerrada';
-      default:
-        return status;
-    }
-  }
-
   protected canUseTieBreaker(state: AssemblyLiveQuestionState | null): boolean {
     if (!state) {
       return false;
     }
-    return state.allowsTieBreaker && !state.tieBreakerUsed && state.yes === state.no;
+    return state.status === 'CLSD' && state.allowsTieBreaker && !state.tieBreakerUsed && state.yes === state.no;
   }
 
   private loadContext(params: ParamMap): void {

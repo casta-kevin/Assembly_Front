@@ -6,12 +6,13 @@
 }
 
 .notifications__header h1 {
-  font-size: var(--font-size-xl);
+  font-size: var(--text-xl);
   margin: 0;
+  color: var(--foreground);
 }
 
 .notifications__header .helper {
-  color: var(--color-text-soft);
+  color: var(--muted-foreground);
   margin-top: var(--space-2xs);
 }
 
@@ -35,16 +36,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
   padding: var(--space-md);
-  background: var(--color-surface-muted);
+  background: var(--muted);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .notification:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--elevation-sm);
 }
 
 .notification--read {
@@ -56,8 +57,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-sm);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
 .notification__status time {
@@ -66,12 +67,13 @@
 
 .notification__body h2 {
   margin: 0;
-  font-size: var(--font-size-lg);
+  font-size: var(--text-lg);
+  color: var(--foreground);
 }
 
 .notification__body p {
   margin: 0;
-  color: var(--color-text-muted);
+  color: var(--muted-foreground);
 }
 
 .notification__body .btn {
@@ -86,7 +88,8 @@
 
 .notifications__empty h2 {
   margin: 0 0 var(--space-xs);
-  font-size: var(--font-size-lg);
+  font-size: var(--text-lg);
+  color: var(--foreground);
 }
 
 .notifications__loading {

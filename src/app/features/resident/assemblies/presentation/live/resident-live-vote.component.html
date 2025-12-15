@@ -24,10 +24,10 @@
     @if (question(); as current) {
       <header class="live-vote__question">
         <span class="badge" [ngClass]="{
-          'badge--running': current.status === 'activa',
-          'badge--ghost': current.status === 'programada',
-          'badge--finished': current.status === 'cerrada'
-        }">{{ current.status | titlecase }}</span>
+          'badge--running': current.status === 'INPR',
+          'badge--ghost': current.status === 'PLND',
+          'badge--finished': current.status === 'CLSD'
+        }">{{ statusLabel(current.status) }}</span>
         <time [attr.datetime]="current.closesAt">Termina: {{ current.closesAt | date: 'medium' }}</time>
       </header>
 

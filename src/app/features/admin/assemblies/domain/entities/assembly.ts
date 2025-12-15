@@ -1,6 +1,6 @@
-export type AssemblyStatus = 'borrador' | 'programada' | 'en-curso' | 'finalizada' | 'cerrada';
+export type AssemblyStatus = 'DRFT' | 'INPR' | 'FNLC';
 
-export type QuestionStatus = 'programada' | 'activa' | 'cerrada';
+export type QuestionStatus = 'PLND' | 'INPR' | 'CLSD';
 export type AssemblyAuditAction =
   | 'assembly-created'
   | 'assembly-updated'
@@ -71,14 +71,19 @@ export interface AssemblyFile {
   uploadedBy: string;
 }
 
+export type ParticipantMembershipStatus = 'INVITED' | 'CONFIRMED' | 'BLOCKED';
+
 export interface AssemblyParticipant {
   id: string;
   name: string;
   unit: string;
   canVoteStart: boolean;
   canVoteQuestions: boolean;
-  status: 'pendiente' | 'confirmado' | 'bloqueado';
+  membershipStatus: ParticipantMembershipStatus;
   joinedAt?: string;
+  confirmationMethodId?: string;
+  confirmedByUserId?: string;
+  confirmedAt?: string;
 }
 
 export interface AssemblyLiveQuestionState {
@@ -159,7 +164,7 @@ export interface AssemblyDetail {
 
 export interface AssemblyFilters {
   search: string;
-  status: AssemblyStatus | 'todas';
+  status: AssemblyStatus | 'ALL';
   range?: {
     start?: string;
     end?: string;

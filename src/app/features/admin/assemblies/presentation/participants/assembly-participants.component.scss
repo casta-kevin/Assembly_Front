@@ -1,7 +1,7 @@
 .participants {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-md);
 }
 
 .participants__header {
@@ -9,28 +9,28 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--space-sm);
 }
 
 .participants__actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-xs);
   align-items: center;
 }
 
 .participants__summary {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1.5rem;
+  gap: var(--space-xs) var(--space-md);
   padding: 0;
-  margin: 0.5rem 0 0;
+  margin: var(--space-2xs) 0 0;
   list-style: none;
-  color: var(--color-text-muted);
+  color: var(--muted-foreground);
 }
 
 .participants__grid {
   display: grid;
-  gap: 1.5rem;
+  gap: var(--space-md);
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
 }
 
@@ -38,15 +38,19 @@
 .participants__available {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-sm);
+  background-color: var(--muted);
+  border-radius: var(--radius);
+  padding: var(--space-sm);
+  border: var(--border-width) solid var(--border);
 }
 
 .participants__empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1.5rem;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
   text-align: center;
 }
 
@@ -54,8 +58,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  padding: 2rem;
+  gap: var(--space-xs);
+  padding: var(--space-lg);
   text-align: center;
 }
 
@@ -66,18 +70,18 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-sm);
 }
 
 .participant-item,
 .candidate-item {
   display: grid;
-  gap: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  background-color: rgba(15, 23, 42, 0.08);
-  box-shadow: var(--shadow-sm);
+  gap: var(--space-sm);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-sm);
+  background-color: var(--card);
+  box-shadow: var(--elevation-sm);
 }
 
 .participant-item {
@@ -87,17 +91,19 @@
 
 .participant-item__info h3 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--text-base);
+  color: var(--foreground);
 }
 
 .participant-item__info p {
-  margin: 0.25rem 0 0;
+  margin: var(--space-3xs) 0 0;
+  color: var(--muted-foreground);
 }
 
 .participant-item__controls {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-xs);
 }
 
 .participant-item__actions {
@@ -112,7 +118,8 @@
 
 .candidate-item__name {
   margin: 0;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
 }
 
 .participants__search {
@@ -122,13 +129,13 @@
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: var(--space-3xs);
 }
 
 .switch {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2xs);
 }
 
 .sr-only {

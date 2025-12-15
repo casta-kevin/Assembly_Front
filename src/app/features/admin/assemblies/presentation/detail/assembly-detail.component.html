@@ -16,7 +16,7 @@
     <section class="surface-card assembly-detail__summary">
       <header class="section-header">
         <h2>{{ detail.title }}</h2>
-        <span class="badge" [class]="detail.status === 'finalizada' || detail.status === 'cerrada' ? 'badge--finished' : 'badge--ghost'">
+        <span class="badge" [class]="statusBadge(detail.status)">
           {{ statusLabel(detail.status) }}
         </span>
       </header>

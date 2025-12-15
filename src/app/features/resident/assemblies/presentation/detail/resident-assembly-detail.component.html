@@ -4,12 +4,7 @@
     @if (assembly(); as detail) {
       <div class="assembly-detail__headline">
         <h1>{{ detail.title }}</h1>
-        <span class="badge" [ngClass]="{
-          'badge--scheduled': detail.status === 'programada',
-          'badge--running': detail.status === 'en-curso',
-          'badge--finished': detail.status === 'finalizada',
-          'badge--closed': detail.status === 'cerrada'
-        }">{{ detail.status | titlecase }}</span>
+        <span class="badge" [ngClass]="statusBadge(detail.status)">{{ statusLabel(detail.status) }}</span>
       </div>
       <p class="helper">Consulta la información compartida por la administración para esta asamblea.</p>
     }

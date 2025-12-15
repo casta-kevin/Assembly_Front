@@ -7,6 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { GetResidentAssemblyDetailUseCase } from '../../../assemblies/application/use-cases/get-resident-assembly-detail.use-case';
 import { ResidentAssemblyDetail } from '../../../assemblies/domain/entities/resident-assembly';
+import { assemblyStatusBadge, assemblyStatusLabel } from '../../../../admin/assemblies/domain/entities/assembly-status.utils';
 
 @Component({
   selector: 'app-resident-assembly-detail',
@@ -26,13 +27,15 @@ export class ResidentAssemblyDetailComponent {
   protected readonly assembly = signal<ResidentAssemblyDetail | null>(null);
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly statusLabel = assemblyStatusLabel;
+  protected readonly statusBadge = assemblyStatusBadge;
 
   protected readonly isHistoryView = computed(() => {
     const status = this.assembly()?.status;
-    return status === 'finalizada' || status === 'cerrada';
+    return status === 'FNLC';
   });
 
-  protected readonly isLiveAssembly = computed(() => this.assembly()?.status === 'en-curso');
+  protected readonly isLiveAssembly = computed(() => this.assembly()?.status === 'INPR');
 
   protected readonly currentQuestion = computed(() => this.assembly()?.currentQuestion ?? null);
 

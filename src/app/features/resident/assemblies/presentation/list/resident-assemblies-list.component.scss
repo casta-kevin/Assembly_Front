@@ -15,12 +15,13 @@
 
 .assignments__header h1 {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: var(--text-xl);
+  color: var(--foreground);
 }
 
 .assignments__header .helper {
   margin: var(--space-2xs) 0 0;
-  color: var(--color-text-soft);
+  color: var(--muted-foreground);
 }
 
 .assignments__stats {
@@ -31,23 +32,24 @@
 }
 
 .assignments__stats div {
-  background: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-sm);
+  background: var(--card);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
   padding: var(--space-sm);
   text-align: center;
 }
 
 .assignments__stats dt {
   margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
 .assignments__stats dd {
   margin: var(--space-2xs) 0 0;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
 }
 
 .assignments__filters {
@@ -78,16 +80,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
   padding: var(--space-md);
-  background: var(--color-surface-muted);
+  background: var(--muted);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .assignment:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--elevation-sm);
 }
 
 .assignment__status {
@@ -95,8 +97,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-sm);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
 .assignment__status time {
@@ -105,20 +107,21 @@
 
 .assignment h2 {
   margin: 0;
-  font-size: var(--font-size-lg);
+  font-size: var(--text-lg);
+  color: var(--foreground);
 }
 
 .assignment p {
   margin: 0;
-  color: var(--color-text-muted);
+  color: var(--muted-foreground);
 }
 
 .assignment__meta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
 .assignment__meta span::before {
@@ -138,7 +141,8 @@
 
 .assignments__empty h2 {
   margin: 0 0 var(--space-xs);
-  font-size: var(--font-size-lg);
+  font-size: var(--text-lg);
+  color: var(--foreground);
 }
 
 .assignments__loading {
