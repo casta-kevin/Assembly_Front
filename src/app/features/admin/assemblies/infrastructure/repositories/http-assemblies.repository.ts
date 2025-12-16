@@ -78,7 +78,7 @@ export class HttpAssembliesRepository implements AssembliesRepository {
   }
 
   findAll(filters?: Partial<AssemblyFilters>): Observable<AssemblySummary[]> {
-    const url = `${this.apiBaseUrl}/assemblies`;
+    const url = `${this.apiBaseUrl}/Assemblies`;
     let params = new HttpParams();
 
     if (filters?.status && filters.status !== 'ALL') {
@@ -113,7 +113,7 @@ export class HttpAssembliesRepository implements AssembliesRepository {
   }
 
   findById(id: string): Observable<AssemblyDetail> {
-    const url = `${this.apiBaseUrl}/assemblies/${id}`;
+    const url = `${this.apiBaseUrl}/Assemblies/${id}`;
 
     return this.http
       .get<ApiResponse<AssemblyDto | null>>(url, { headers: this.buildHeaders() })
@@ -157,7 +157,7 @@ export class HttpAssembliesRepository implements AssembliesRepository {
   }
 
   private createAssembly(payload: AssemblyDetail): Observable<string> {
-    const url = `${this.apiBaseUrl}/assemblies`;
+    const url = `${this.apiBaseUrl}/Assemblies`;
     const body = this.buildAssemblyRequestBody(payload);
 
     return this.http
@@ -181,7 +181,7 @@ export class HttpAssembliesRepository implements AssembliesRepository {
   }
 
   private updateAssembly(payload: AssemblyDetail): Observable<void> {
-    const url = `${this.apiBaseUrl}/assemblies/${payload.id}`;
+    const url = `${this.apiBaseUrl}/Assemblies/${payload.id}`;
     const body = this.buildAssemblyRequestBody(payload);
 
     return this.http
@@ -208,7 +208,7 @@ export class HttpAssembliesRepository implements AssembliesRepository {
       return of(void 0);
     }
 
-    const url = `${this.apiBaseUrl}/assemblies/${assemblyId}/agenda`;
+    const url = `${this.apiBaseUrl}/Assemblies/${assemblyId}/Agenda`;
     const body: CreateAgendaDto = {
       assemblyId,
       questions,

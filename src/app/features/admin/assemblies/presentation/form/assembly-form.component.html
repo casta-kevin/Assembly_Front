@@ -5,17 +5,6 @@
       <h1>{{ isNew() ? 'Crear asamblea' : 'Editar asamblea' }}</h1>
       <p class="helper">Gestiona la configuración general y reglas. El orden del día ahora vive en una vista separada.</p>
     </div>
-    <div class="assembly-form__actions">
-      <button class="btn btn-ghost" type="button" (click)="cancel()">Cancelar</button>
-      <button class="btn btn-primary" type="button" [disabled]="isSaving()" (click)="save()">
-        @if (isSaving()) {
-          <span class="spinner" aria-hidden="true"></span>
-          <span>Guardando…</span>
-        } @else {
-          <span>Guardar asamblea</span>
-        }
-      </button>
-    </div>
   </header>
 
   @if (!isNew()) {
@@ -146,6 +135,18 @@
         </button>
       </div>
     </section>
+
+    <div class="assembly-form__actions assembly-form__actions--footer">
+      <button class="btn btn-ghost" type="button" (click)="cancel()">Cancelar</button>
+      <button class="btn btn-primary" type="button" [disabled]="isSaving()" (click)="save()">
+        @if (isSaving()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Guardando…</span>
+        } @else {
+          <span>Guardar asamblea</span>
+        }
+      </button>
+    </div>
   </form>
 </section>
 

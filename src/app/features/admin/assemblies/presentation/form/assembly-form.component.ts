@@ -1,18 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, of, switchMap } from 'rxjs';
 
 import { GetAssemblyUseCase } from '../../../assemblies/application/use-cases/get-assembly.use-case';
 import { SaveAssemblyUseCase } from '../../../assemblies/application/use-cases/save-assembly.use-case';
-import {
-  AgendaTopic,
-  AssemblyDetail,
-  AssemblyLiveState,
-  AssemblyStatus,
-  TopicQuestion,
-} from '../../../assemblies/domain/entities/assembly';
+import { AgendaTopic, AssemblyDetail, AssemblyLiveState, AssemblyStatus } from '../../../assemblies/domain/entities/assembly';
 
 @Component({
   selector: 'app-assembly-form',
@@ -72,17 +67,12 @@ export class AssemblyFormComponent {
     status: this.fb.nonNullable.control<AssemblyStatus>('DRFT', Validators.required),
     canManageInitiators: [true],
     initiatorIds: this.fb.nonNullable.array<string>([]) as FormArray<FormControl<string>>,
-    agenda: this.fb.nonNullable.array<FormGroup>([]) as FormArray<FormGroup>,
   });
 
   constructor() {
     this.route.paramMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => this.initializeForm(params));
-  }
-
-  protected get agenda(): FormArray<FormGroup> {
-    return this.form.controls.agenda;
   }
 
   protected initiatorSelected(id: string): boolean {
@@ -101,9 +91,8 @@ export class AssemblyFormComponent {
   }
 
   protected firstTopicId(): string | null {
-    const control = this.agenda.at(0);
-    const value = control?.get('id')?.value;
-    return typeof value === 'string' && value.length ? value : null;
+    const agenda = this.baseline()?.agenda ?? [];
+    return agenda[0]?.id ?? null;
   }
 
   protected save(): void {
@@ -114,6 +103,7 @@ export class AssemblyFormComponent {
     }
 
     const payload = this.buildPayload();
+    const wasNew = this.isNew();
 
     this.isSaving.set(true);
     this.errorMessage.set(null);
@@ -121,15 +111,25 @@ export class AssemblyFormComponent {
 
     this.saveAssembly
       .execute(payload)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        switchMap((saved) =>
+          this.getAssembly
+            .execute(saved.id)
+            .pipe(catchError(() => of(saved))),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
-        next: (updated) => {
+        next: (detail) => {
           this.successMessage.set('Asamblea guardada correctamente.');
           this.isSaving.set(false);
-          this.assemblyId.set(updated.id);
+          this.assemblyId.set(detail.id);
           this.isNew.set(false);
-          this.baseline.set(updated);
-          void this.router.navigate(['/admin', 'assemblies', updated.id]);
+          this.baseline.set(detail);
+          this.patchForm(detail);
+          if (wasNew) {
+            void this.router.navigate(['/admin', 'assemblies', detail.id]);
+          }
         },
         error: (error: unknown) => {
           const message = error instanceof Error ? error.message : 'No fue posible guardar la asamblea.';
@@ -192,41 +192,6 @@ export class AssemblyFormComponent {
 
     this.form.controls.initiatorIds.clear();
     detail.initiatorIds.forEach((id) => this.form.controls.initiatorIds.push(this.fb.nonNullable.control(id)));
-
-    this.agenda.clear();
-    detail.agenda.forEach((topic) => this.agenda.push(this.buildTopicGroup(topic)));
-  }
-
-  private buildTopicGroup(topic?: Partial<AgendaTopic>): FormGroup {
-    const group = this.fb.nonNullable.group({
-      id: [topic?.id ?? this.generateTopicId()],
-      title: [topic?.title ?? '', Validators.required],
-      description: [topic?.description ?? '', Validators.maxLength(600)],
-      startAt: [topic?.startAt ?? ''],
-      endAt: [topic?.endAt ?? ''],
-      questions: this.fb.nonNullable.array<FormGroup>([]) as FormArray<FormGroup>,
-    });
-
-    const questionsArray = group.controls.questions;
-    (topic?.questions ?? []).forEach((question) => questionsArray.push(this.buildQuestionGroup(question)));
-
-    if (!questionsArray.length) {
-      questionsArray.push(this.buildQuestionGroup());
-    }
-
-    return group;
-  }
-
-  private buildQuestionGroup(question?: Partial<TopicQuestion>): FormGroup {
-    return this.fb.nonNullable.group({
-      id: [question?.id ?? this.generateQuestionId()],
-      text: [question?.text ?? '', [Validators.required, Validators.maxLength(280)]],
-      description: [question?.description ?? '', Validators.maxLength(400)],
-      startAt: [question?.startAt ?? ''],
-      endAt: [question?.endAt ?? ''],
-      allowsTieBreaker: [question?.allowsTieBreaker ?? true],
-      status: [question?.status ?? 'PLND'],
-    });
   }
 
   private buildPayload(): AssemblyDetail {
@@ -242,27 +207,8 @@ export class AssemblyFormComponent {
     } = this.form.getRawValue();
 
     const initiatorIds = this.form.controls.initiatorIds.controls.map((control) => control.value);
-    const agenda = this.agenda.controls.map((topic) => {
-      const questionsArray = topic.get('questions') as FormArray<FormGroup>;
-      return {
-        id: topic.get('id')?.value,
-        title: topic.get('title')?.value,
-        description: topic.get('description')?.value || undefined,
-        startAt: topic.get('startAt')?.value || undefined,
-        endAt: topic.get('endAt')?.value || undefined,
-        questions: questionsArray.controls.map((question) => ({
-          id: question.get('id')?.value,
-          text: question.get('text')?.value,
-          description: question.get('description')?.value || undefined,
-          startAt: question.get('startAt')?.value || undefined,
-          endAt: question.get('endAt')?.value || undefined,
-          allowsTieBreaker: question.get('allowsTieBreaker')?.value ?? false,
-          status: question.get('status')?.value || undefined,
-        })),
-      } satisfies AgendaTopic;
-    });
-
     const baseline = this.baseline();
+    const agenda = structuredClone(baseline?.agenda ?? []) as AgendaTopic[];
     const participants = baseline?.participants ?? [];
     const availableParticipants = baseline?.availableParticipants ?? structuredClone(this.residentCatalog);
     const liveState = baseline?.liveState ?? this.buildDefaultLiveState(agenda);
@@ -299,28 +245,7 @@ export class AssemblyFormComponent {
       copy.setHours(copy.getHours() + hours);
       return copy.toISOString();
     };
-
-    const topicId = this.generateTopicId();
-    const questionId = this.generateQuestionId();
-    const agenda: AgendaTopic[] = [
-      {
-        id: topicId,
-        title: 'Nuevo topic',
-        description: '',
-        startAt: inHours(48),
-        endAt: inHours(49),
-        questions: [
-          {
-            id: questionId,
-            text: '¿Aprueba la propuesta inicial?',
-            allowsTieBreaker: true,
-            startAt: inHours(48.25),
-            endAt: inHours(48.5),
-            status: 'PLND',
-          },
-        ],
-      },
-    ];
+    const agenda: AgendaTopic[] = [];
 
     return {
       id,
@@ -381,13 +306,5 @@ export class AssemblyFormComponent {
 
   private generateAssemblyId(): string {
     return `asm-${Math.random().toString(36).slice(2, 8)}`;
-  }
-
-  private generateTopicId(): string {
-    return `topic-${Math.random().toString(36).slice(2, 8)}`;
-  }
-
-  private generateQuestionId(): string {
-    return `question-${Math.random().toString(36).slice(2, 8)}`;
   }
 }
